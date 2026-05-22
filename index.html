@@ -16,662 +16,957 @@
             --border-mid: rgba(80, 160, 255, 0.22);
             --border-bright: rgba(80, 160, 255, 0.5);
 
-            --text-primary: #d1f4ff;
-            --text-secondary: #7faec4;
+            --text-primary: #f0f5ff;
+            --text-secondary: #8da2c0;
+            --text-dark: #415674;
 
-            --color-clinic: #00f0ff;
-            --color-office: #ff007b;
-            --color-center: #ffaa00;
+            --color-clinic: #00ffcc;
+            --color-office: #ff007f;
+            --color-center: #3a86ff;
+            --color-warn: #ffbe0b;
+
+            --glow-clinic: 0 0 12px rgba(0, 255, 204, 0.35);
+            --glow-office: 0 0 12px rgba(255, 0, 127, 0.35);
+            --glow-center: 0 0 12px rgba(58, 134, 255, 0.35);
+
+            --font-main: 'Space Grotesk', 'Noto Sans KR', sans-serif;
+            --font-mono: 'Share Tech Mono', monospace;
+            --font-title: 'Orbitron', sans-serif;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif;
             user-select: none;
+            -webkit-user-drag: none;
         }
 
         body {
             background-color: var(--bg-deep);
+            background-image: 
+                linear-gradient(rgba(60, 90, 150, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(60, 90, 150, 0.04) 1px, transparent 1px);
+            background-size: 32px 32px;
             color: var(--text-primary);
+            font-family: var(--font-main);
             overflow: hidden;
-            width: 100vw;
             height: 100vh;
-            position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 4px, 6px 100%;
-            z-index: 999;
-            pointer-events: none;
-            opacity: 0.4;
-        }
-
-        .terminal-container {
+            width: 100vw;
             display: flex;
             flex-direction: column;
-            width: 100%;
-            height: 100%;
-            padding: 15px;
-            gap: 15px;
         }
 
-        .header-panel {
-            background: var(--bg-panel);
-            border: 1px solid var(--border-mid);
-            padding: 12px 20px;
+        /* Scanlines Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 99999;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.05);
-            position: relative;
-        }
-
-        .header-panel::after {
-            content: '';
-            position: absolute;
-            bottom: -1px; left: 10%; width: 80%; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--color-clinic), transparent);
-        }
-
-        .status-node {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            background-color: var(--color-clinic);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--color-clinic);
-            animation: blink 1.5s infinite alternate;
-        }
-
-        @keyframes blink {
-            0% { opacity: 0.3; }
-            100% { opacity: 1; }
+            padding: 12px 24px;
+            background: rgba(4, 7, 15, 0.85);
+            border-bottom: 1px solid var(--border-mid);
+            backdrop-filter: blur(10px);
+            z-index: 100;
         }
 
         .terminal-title {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            font-size: 1.2rem;
+            font-family: var(--font-title);
+            font-weight: 900;
+            font-size: 1.1rem;
             letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
-        }
-
-        .time-stamp {
-            font-family: 'Share Tech Mono', monospace;
-            color: var(--color-office);
-        }
-
-        .grid-layout {
-            display: grid;
-            grid-template-columns: 320px 1fr 340px;
-            flex: 1;
-            gap: 15px;
-            min-height: 0;
-        }
-
-        .side-panel {
-            background: var(--bg-panel);
-            border: 1px solid var(--border-mid);
+            color: var(--text-primary);
             display: flex;
-            flex-direction: column;
-            min-height: 0;
-        }
-
-        .center-panel {
-            display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            background: rgba(4, 8, 16, 0.5);
-            border: 1px solid var(--border-dim);
+            gap: 10px;
+        }
+
+        .terminal-title span {
+            color: var(--color-center);
+            text-shadow: var(--glow-center);
+            font-size: 0.8rem;
+            border: 1px solid var(--color-center);
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-family: var(--font-mono);
+        }
+
+        .system-status {
+            display: flex;
+            gap: 20px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--color-clinic);
+            box-shadow: var(--glow-clinic);
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        .main-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 280px 1fr 340px;
+            gap: 16px;
+            padding: 16px;
+            height: calc(100vh - 55px);
             position: relative;
+        }
+
+        /* Panels Shared Layout */
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-dim);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
+            backdrop-filter: blur(8px);
+            transition: border-color 0.3s;
+        }
+
+        .panel:hover {
+            border-color: var(--border-mid);
         }
 
         .panel-header {
-            padding: 10px 15px;
-            border-bottom: 1px solid var(--border-mid);
-            font-family: 'Orbitron', sans-serif;
+            padding: 12px 16px;
+            background: rgba(12, 22, 42, 0.5);
+            border-bottom: 1px solid var(--border-dim);
+            font-family: var(--font-title);
             font-size: 0.85rem;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 1px;
             color: var(--text-secondary);
-            background: rgba(8, 20, 38, 0.4);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .log-container {
+        .panel-header::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 3px;
+            height: 16px;
+            background: var(--color-center);
+        }
+
+        .panel-content {
             flex: 1;
-            padding: 15px;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.85rem;
+            padding: 16px;
             overflow-y: auto;
+        }
+
+        /* Left Sidebar - Navigation & File Tree */
+        .sidebar-left {
+            grid-column: 1;
+        }
+
+        .nav-list {
+            list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            color: var(--text-secondary);
+            gap: 6px;
         }
 
-        .log-entry {
-            line-height: 1.3;
-            border-left: 2px solid transparent;
-            padding-left: 6px;
-        }
-
-        .log-entry.system { border-color: var(--color-clinic); color: var(--text-primary); }
-        .log-entry.success { border-color: var(--color-clinic); color: var(--color-clinic); }
-        .log-entry.warning { border-color: var(--color-center); color: var(--color-center); }
-        .log-entry.danger { border-color: var(--color-office); color: var(--color-office); }
-
-        .stat-box {
-            padding: 20px;
+        .nav-item {
             display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            border-bottom: 1px dashed var(--border-dim);
-            padding-bottom: 8px;
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
             color: var(--text-secondary);
+            border: 1px solid transparent;
+            transition: all 0.2s;
         }
 
-        .stat-value {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: var(--color-clinic);
-            text-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+        .nav-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-color: rgba(80, 160, 255, 0.15);
         }
 
-        .stat-value.alt {
-            color: var(--color-office);
-            text-shadow: 0 0 8px rgba(255, 0, 123, 0.2);
+        .nav-item.active {
+            background: rgba(5a, 134, 255, 0.12);
+            color: var(--text-primary);
+            border-color: rgba(5a, 134, 255, 0.4);
+            box-shadow: inset 0 0 8px rgba(5a, 134, 255, 0.1);
         }
 
-        #game-canvas {
-            background: #020408;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 240, 255, 0.03);
-            border-left: 1px solid var(--border-dim);
-            border-right: 1px solid var(--border-dim);
+        .nav-item .icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+            width: 18px;
+            text-align: center;
         }
 
-        .cost-bar-container {
+        .nav-item.active .icon {
+            color: var(--color-center);
+            text-shadow: var(--glow-center);
+        }
+
+        /* Center Viewport - Workspace */
+        .workspace {
+            grid-column: 2;
+            position: relative;
+            background: rgba(5, 9, 19, 0.9);
+            border: 1px solid var(--border-mid);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+        }
+
+        /* Right Sidebar - Status & Calibration */
+        .sidebar-right {
+            grid-column: 3;
+        }
+
+        /* Game Arena Specifics */
+        .game-viewport {
             width: 100%;
-            height: 6px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border-dim);
-            margin-top: 5px;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #canvas-container {
+            width: 440px;
+            height: 680px;
+            background: #060b13;
+            border: 2px solid var(--border-bright);
+            box-shadow: 0 0 25px rgba(80, 160, 255, 0.15);
+            position: relative;
+            border-radius: 4px;
             overflow: hidden;
         }
 
-        .cost-fill {
+        #game-canvas {
+            width: 100%;
             height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--color-clinic), var(--color-office));
-            transition: width 0.3s ease;
         }
 
-        .sync-indicator {
+        /* Rhythm Mechanic Interface Overlay */
+        .sync-overlay {
             position: absolute;
-            top: 25px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 900;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
             pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.1s ease;
             z-index: 10;
         }
 
-        .custom-cursor {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            border: 1px solid var(--color-clinic);
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            z-index: 100;
-            display: none;
-            box-sizing: border-box;
-            transition: width 0.1s, height 0.1s, box-shadow 0.3s;
+        .metric-box {
+            background: rgba(4, 7, 15, 0.85);
+            border: 1px solid var(--border-mid);
+            padding: 8px 12px;
+            border-radius: 4px;
+            min-width: 100px;
         }
 
-        .custom-cursor::before {
+        .metric-label {
+            font-size: 0.7rem;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .metric-value.clinic-pool {
+            color: var(--color-clinic);
+            text-shadow: var(--glow-clinic);
+        }
+
+        .metric-value.office-pool {
+            color: var(--color-office);
+            text-shadow: var(--glow-office);
+        }
+
+        /* Rhythm Bar */
+        .rhythm-timeline {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 380px;
+            height: 40px;
+            background: rgba(4, 7, 15, 0.9);
+            border: 1px solid var(--border-mid);
+            border-radius: 6px;
+            pointer-events: none;
+            z-index: 10;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        .sync-target-zone {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 44px;
+            height: 100%;
+            background: rgba(0, 255, 204, 0.12);
+            border-left: 2px dashed rgba(0, 255, 204, 0.4);
+            border-right: 2px dashed rgba(0, 255, 204, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .sync-target-center {
+            width: 2px;
+            height: 100%;
+            background: var(--color-clinic);
+            box-shadow: var(--glow-clinic);
+        }
+
+        .rhythm-node {
+            position: absolute;
+            top: 4px;
+            width: 6px;
+            height: 30px;
+            background: var(--color-office);
+            box-shadow: var(--glow-office);
+            border-radius: 2px;
+            transform: translateX(-50%);
+        }
+
+        /* Calibration Panel Graphics */
+        .calibration-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 100%;
+        }
+
+        .status-card {
+            background: rgba(12, 22, 42, 0.3);
+            border: 1px solid var(--border-dim);
+            padding: 14px;
+            border-radius: 4px;
+        }
+
+        .card-title {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .bar-fill.clinic {
+            background: var(--color-clinic);
+            box-shadow: var(--glow-clinic);
+        }
+
+        .bar-fill.office {
+            background: var(--color-office);
+            box-shadow: var(--glow-office);
+        }
+
+        .bar-fill.cost {
+            background: var(--color-warn);
+            box-shadow: 0 0 10px rgba(255, 190, 11, 0.5);
+            width: 0%;
+            transition: width 0.3s cubic-bezier(0.1, 0.8, 0.3, 1);
+        }
+
+        /* Log Terminal */
+        .log-terminal {
+            flex: 1;
+            background: rgba(3, 5, 10, 0.95);
+            border: 1px solid var(--border-dim);
+            border-radius: 4px;
+            padding: 10px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
+        }
+
+        .log-line {
+            display: flex;
+            gap: 8px;
+            line-height: 1.3;
+        }
+
+        .log-timestamp {
+            color: var(--text-dark);
+            flex-shrink: 0;
+        }
+
+        .log-tag {
+            flex-shrink: 0;
+            padding: 0 3px;
+            border-radius: 2px;
+            font-size: 0.7rem;
+        }
+
+        .log-tag.info { background: rgba(58, 134, 255, 0.15); color: var(--color-center); }
+        .log-tag.success { background: rgba(0, 255, 204, 0.15); color: var(--color-clinic); }
+        .log-tag.alert { background: rgba(255, 0, 127, 0.15); color: var(--color-office); }
+
+        .log-text {
+            word-break: break-all;
+        }
+
+        /* Score & Prompt Overlay Popup */
+        .sync-result-popup {
+            position: absolute;
+            top: 140px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--font-title);
+            font-size: 1.4rem;
+            font-weight: 900;
+            pointer-events: none;
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 0.08s, transform 0.08s;
+            letter-spacing: 1px;
+        }
+
+        /* Custom Drop Guide Line */
+        .drop-guide {
+            position: absolute;
+            top: 0;
+            width: 1px;
+            height: 100%;
+            border-left: 1px dashed rgba(80, 160, 255, 0.25);
+            pointer-events: none;
+            display: none;
+        }
+
+        /* Interactive Custom Cursor Elements */
+        .custom-game-cursor {
+            position: absolute;
+            top: 40px;
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--color-clinic);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            display: none;
+            z-index: 8;
+            box-shadow: var(--glow-clinic);
+            transition: border-color 0.2s, box-shadow 0.2s, width 0.1s, height 0.1s;
+        }
+
+        .custom-game-cursor::before {
             content: '';
             position: absolute;
             top: 50%; left: 50%;
             width: 4px; height: 4px;
-            background: var(--color-clinic);
+            background: #fff;
             border-radius: 50%;
             transform: translate(-50%, -50%);
         }
-
-        .next-preview-box {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px dashed var(--border-mid);
-            margin: 15px;
-            height: 100px;
-            position: relative;
-        }
-
-        .next-preview-label {
-            position: absolute;
-            top: 5px; left: 8px;
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-            font-family: 'Share Tech Mono', monospace;
-        }
-
-        #next-preview-canvas {
-            width: 80px;
-            height: 80px;
-        }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border-mid); }
-        ::-webkit-scrollbar-thumb:hover { background: var(--border-bright); }
     </style>
 </head>
 <body>
 
-<div class="custom-cursor" id="custom-cursor"></div>
-
-<div class="terminal-container">
-    <header class="header-panel">
-        <div class="status-node">
-            <div class="status-indicator"></div>
-            <span>SYS_STATUS: ACTIVE // SECURE_NODE_5</span>
+    <header>
+        <div class="terminal-title">
+            COVE_TERMINAL <span>v5.0.24</span>
         </div>
-        <h1 class="terminal-title">COVE ARCHIVE TERMINAL</h1>
-        <div class="time-stamp" id="time-stamp">00:00:00 // UTC</div>
+        <div class="system-status">
+            <div class="status-item">
+                <div class="status-dot"></div>
+                CORE_LINK: ESTABLISHED
+            </div>
+            <div class="status-item" id="realtime-clock">
+                00:00:00:00
+            </div>
+        </div>
     </header>
 
-    <div class="grid-layout">
-        <aside class="side-panel">
-            <div class="panel-header">
-                <span>SYSTEM ACTIVITY LOG</span>
-                <span style="color: var(--color-clinic)">v5.0.2</span>
+    <div class="main-container">
+        <div class="panel sidebar-left">
+            <div class="panel-header">ARCHIVE_INDEX</div>
+            <div class="panel-content">
+                <ul class="nav-list">
+                    <li class="nav-item active" data-target="clinic">
+                        <span class="icon">⚡</span> CLINIC_CALIBRATOR
+                    </li>
+                    <li class="nav-item" data-target="office">
+                        <span class="icon">🩸</span> OFFICE_REGISTRY
+                    </li>
+                    <li class="nav-item" data-target="center">
+                        <span class="icon">🌐</span> CENTER_MATRIX
+                    </li>
+                </ul>
             </div>
-            <div class="log-container" id="log-container">
-                <div class="log-entry system">[SYSTEM] COVE 아카이브 터미널 엔진 초기화 완료.</div>
-                <div class="log-entry system">[SYSTEM] 물리 처리용 서브시스템 연결 성공.</div>
-                <div class="log-entry warning">[WARNING] 싱크로율 유실 위험 감지됨. 정밀 조정 요망.</div>
-            </div>
-        </aside>
+        </div>
 
-        <main class="center-panel" id="center-panel">
-            <div class="sync-indicator" id="sync-indicator">SYNC 성공</div>
-            <canvas id="game-canvas"></canvas>
-        </main>
+        <div class="panel workspace">
+            <div class="panel-header" id="workspace-title">INTEGRATED_SANDBOX // AREA_01</div>
+            <div class="game-viewport">
+                <div id="canvas-container">
+                    <div class="sync-overlay">
+                        <div class="metric-box">
+                            <div class="metric-label">Clinic Pool</div>
+                            <div class="metric-value clinic-pool" id="val-clinic-pool">00.0%</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Office Pool</div>
+                            <div class="metric-value office-pool" id="val-office-pool">00.0%</div>
+                        </div>
+                    </div>
 
-        <aside class="side-panel">
-            <div class="panel-header">
-                <span>DIAGNOSTIC METERS</span>
-            </div>
-            
-            <div class="next-preview-box">
-                <div class="next-preview-label">NEXT_CORE_GEN</div>
-                <canvas id="next-preview-canvas" width="80" height="80"></canvas>
-            </div>
+                    <div class="sync-result-popup" id="sync-pop">SYNC SUCCESS</div>
+                    <div class="drop-guide" id="drop-line"></div>
+                    <div class="custom-game-cursor" id="game-cursor"></div>
 
-            <div class="stat-box">
-                <div class="stat-row">
-                    <span class="stat-label">TOTAL EXTRACTED SCORE</span>
-                    <span class="stat-value" id="score-val">000,000</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">STREAK SYNC COMBO</span>
-                    <span class="stat-value alt" id="combo-val">X 0</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">SYNC RATE PER UNIT</span>
-                    <span class="stat-value" id="sync-rate-val">100%</span>
-                </div>
-                <div>
-                    <span class="stat-label" style="display:flex; justify-content:space-between; font-size:0.75rem;">
-                        <span>OVERHEAT IMMERSION PENALTY</span>
-                        <span id="cost-percent-val" style="color: var(--color-office)">0%</span>
-                    </span>
-                    <div class="cost-bar-container">
-                        <div class="cost-fill" id="cost-fill"></div>
+                    <div id="game-canvas"></div>
+
+                    <div class="rhythm-timeline" id="rhythm-bar">
+                        <div class="sync-target-zone">
+                            <div class="sync-target-center"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </aside>
+        </div>
+
+        <div class="panel sidebar-right">
+            <div class="panel-header">MONITOR_UNIT</div>
+            <div class="panel-content calibration-grid">
+                <div class="status-card">
+                    <div class="card-title">
+                        <span>SYNCHRONIZATION RATIO</span>
+                        <span id="txt-sync-ratio">100%</span>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar-fill clinic" id="bar-sync-ratio" style="width: 100%"></div>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <div class="card-title">
+                        <span>STABILITY COST PENALTY</span>
+                        <span id="txt-cost-penalty">0 / 100</span>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar-fill cost" id="bar-cost-penalty"></div>
+                    </div>
+                </div>
+
+                <div class="log-terminal" id="terminal-log">
+                    <div class="log-line">
+                        <span class="log-timestamp">[00:00:00]</span>
+                        <span class="log-tag info">SYS</span>
+                        <span class="log-text">Terminal diagnostics online. Welcome back operator.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
-<script>
-    const { Engine, Render, Runner, Bodies, Composite, Body, Events } = Matter;
+    <script>
+    // System Utilities & Clock Setup
+    function updateClock() {
+        const d = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        const ms = String(Math.floor(d.getMilliseconds() / 10)).padStart(2, '0');
+        document.getElementById('realtime-clock').textContent = 
+            `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}:${ms}`;
+    }
+    setInterval(updateClock, 35);
 
-    // --- SYSTEM CONFIGURATIONS ---
+    const logEl = document.getElementById('terminal-log');
+    function appendLog(tag, type, message) {
+        const d = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        const ts = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+        
+        const line = document.createElement('div');
+        line.className = 'log-line';
+        line.innerHTML = `
+            <span class="log-timestamp">[${ts}]</span>
+            <span class="log-tag ${type}">${tag}</span>
+            <span class="log-text">${message}</span>
+        `;
+        logEl.appendChild(line);
+        logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    // Tab Navigation Logic
+    const navItems = document.querySelectorAll('.nav-item');
+    const wsTitle = document.getElementById('workspace-title');
+    let currentMode = 'clinic';
+
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            navItems.forEach(n => n.classList.remove('active'));
+            item.classList.add('active');
+            const mode = item.getAttribute('data-target');
+            currentMode = mode;
+            wsTitle.textContent = `INTEGRATED_SANDBOX // AREA_${mode.toUpperCase()}`;
+            appendLog('MODE', 'info', `Switched workspace terminal pipeline to channel: ${mode.toUpperCase()}`);
+            
+            // Alter aesthetics based on configuration channel
+            const cursor = document.getElementById('game-cursor');
+            if(mode === 'clinic') {
+                cursor.style.borderColor = 'var(--color-clinic)';
+                cursor.style.boxShadow = 'var(--glow-clinic)';
+            } else if(mode === 'office') {
+                cursor.style.borderColor = 'var(--color-office)';
+                cursor.style.boxShadow = 'var(--glow-office)';
+            } else {
+                cursor.style.borderColor = 'var(--color-center)';
+                cursor.style.boxShadow = 'var(--glow-center)';
+            }
+        });
+    });
+
+    // ==========================================
+    // MATTER.JS COVE WATERMELON LOGIC PIPELINE
+    // ==========================================
+    const { Engine, Render, Runner, Bodies, Composite, Body, Events, Vector } = Matter;
+
+    const container = document.getElementById('canvas-container');
+    const canvasWrap = document.getElementById('game-canvas');
+    const customCursor = document.getElementById('game-cursor');
+    const dropLine = document.getElementById('drop-line');
+
+    const width = 440;
+    const height = 680;
+    const deadLineY = 120; // Collision failure boundary line
+
+    const engine = Engine.create({ gravity: { y: 0.95 } });
+    const world = engine.world;
+
+    const render = Render.create({
+        element: canvasWrap,
+        engine: engine,
+        options: {
+            width: width,
+            height: height,
+            background: 'transparent',
+            wireframes: false,
+            showVelocity: false
+        }
+    });
+
+    Render.run(render);
+    const runner = Runner.create();
+    Runner.run(runner, engine);
+
+    // Build Static Container Walls
+    const wallOptions = { isStatic: true, render: { fillStyle: '#111a2e' } };
+    const ground = Bodies.rectangle(width / 2, height + 30, width * 2, 80, wallOptions);
+    const leftWall = Bodies.rectangle(-30, height / 2, 80, height * 2, wallOptions);
+    const rightWall = Bodies.rectangle(width + 30, height / 2, 80, height * 2, wallOptions);
+    Composite.add(world, [ground, leftWall, rightWall]);
+
+    // Sandbox Configurations & Circle Scaling Setup
+    // 원 안에 들어갈 이미지 파일 크기의 기준점 지정을 위한 상수입니다.
+    // 만약 캐릭터 이미지 파일의 실제 가로세로 크기가 모두 500px 규격이라면 500으로 수정하면 정밀하게 매칭됩니다.
+    const IMAGE_SIZE = 200; 
+
     const cfg = {
-        canvasWidth: 440,
-        canvasHeight: 650,
-        dropY: 80,
-        bpm: 128,
-        costPenalty: 12,
-        costDecay: 0.15
+        radii: [16, 24, 32, 40, 50, 62, 76, 92, 110, 130, 155],
+        colors: [
+            '#00ffcc', '#05e3ff', '#3a86ff', '#7209b7', '#f72585',
+            '#ff007f', '#ff3f3f', '#ffaa00', '#ffee00', '#a2ff00', '#00ff55'
+        ],
+        spawnCooldown: 620,
+        costPenalty: 8,
+        costRecovery: 3
     };
 
-    // --- IMAGE & FRUIT SETTINGS ---
-    // 보유하고 계신 이미지(A1.PNG ~ A11.PNG)의 가로/세로 원본 해상도 크기를 적어주세요. (기본값 300px)
-    // 원본 크기를 적어두시면 게임 속 반지름에 맞춰 정확한 크기로 자동 변환 및 압축 스케일링됩니다.
-    const IMAGE_BASE_SIZE = 300; 
+    let nextFruitLevel = 0;
+    let currentFruitBody = null;
+    let isCooldown = false;
+    let lastSpawnTime = 0;
 
-    const FRUIT_CLASSES = [
-        { radius: 15, color: '#ff4154', name: 'CORE_ALPHA', score: 2, image: 'A1.PNG' },
-        { radius: 23, color: '#ff7626', name: 'CORE_BETA', score: 4, image: 'A2.PNG' },
-        { radius: 31, color: '#ffbd21', name: 'CORE_GAMMA', score: 8, image: 'A3.PNG' },
-        { radius: 40, color: '#00e575', name: 'CORE_DELTA', score: 16, image: 'A4.PNG' },
-        { radius: 50, color: '#00b0ff', name: 'CORE_EPSILON', score: 32, image: 'A5.PNG' },
-        { radius: 62, color: '#7c4dff', name: 'CORE_ZETA', score: 64, image: 'A6.PNG' },
-        { radius: 75, color: '#e040fb', name: 'CORE_ETA', score: 128, image: 'A7.PNG' },
-        { radius: 90, color: '#ff2c7d', name: 'CORE_THETA', score: 256, image: 'A8.PNG' },
-        { radius: 108, color: '#00e676', name: 'CORE_IOTA', score: 512, image: 'A9.PNG' },
-        { radius: 128, color: '#ffeb3b', name: 'CORE_KAPPA', score: 1024, image: 'A10.PNG' },
-        { radius: 150, color: '#00e5ff', name: 'SINGULARITY', score: 2048, image: 'A11.PNG' }
-    ];
-
-    // --- GAME STATE ---
-    let engine, render, runner;
-    let currentFruit = null;
-    let nextIndex = getRandomFruitIndex();
-    let score = 0;
-    let globalCost = 0; 
+    // Rhythm Engine Mechanics Properties
+    let nodes = [];
+    let rhythmActive = true;
     let syncTotal = 0;
     let syncOk = 0;
     let syncConsecutive = 0;
+    let globalCost = 0; // 0 to 100. Overflows crash the core matrix game loop
 
-    let beatInterval = (60 / cfg.bpm) * 1000;
-    let lastBeatTime = Date.now();
-
-    // --- INITIALIZATION ---
-    function init() {
-        setupClock();
-        setupPhysics();
-        setupInteraction();
-        spawnNextFruit();
-        animateLoop();
+    function generateNextLevel() {
+        return Math.floor(Math.random() * 4);
     }
 
-    function setupClock() {
-        setInterval(() => {
-            const now = new Date();
-            const pad = (n) => String(n).padStart(2, '0');
-            document.getElementById('time-stamp').textContent = 
-                `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} // L-NOD`;
-        }, 1000);
+    function syncLevelToRadius(level) {
+        return cfg.radii[Math.min(level, cfg.radii.length - 1)];
     }
 
-    function setupPhysics() {
-        engine = Engine.create({ gravity: { y: 1.1 } });
-
-        render = Render.create({
-            canvas: document.getElementById('game-canvas'),
-            engine: engine,
-            options: {
-                width: cfg.canvasWidth,
-                height: cfg.canvasHeight,
-                background: 'transparent',
-                wireframes: false
-            }
-        });
-
-        Render.run(render);
-        runner = Runner.create();
-        Runner.run(runner, engine);
-
-        // Walls
-        const wallOptions = { isStatic: true, render: { fillStyle: 'rgba(80, 160, 255, 0.08)' } };
-        const ground = Bodies.rectangle(cfg.canvasWidth / 2, cfg.canvasHeight + 30, cfg.canvasWidth, 80, wallOptions);
-        const leftWall = Bodies.rectangle(-30, cfg.canvasHeight / 2, 80, cfg.canvasHeight, wallOptions);
-        const rightWall = Bodies.rectangle(cfg.canvasWidth + 30, cfg.canvasHeight / 2, 80, cfg.canvasHeight, wallOptions);
+    // ==========================================
+    // 캐릭터 이미지(A1.PNG ~ A11.PNG) 연동 부분
+    // ==========================================
+    function createFruitBody(x, y, level, isStatic = false) {
+        const radius = syncLevelToRadius(level);
         
-        // DeadLine Indicator line
-        const deadLine = Bodies.rectangle(cfg.canvasWidth / 2, 130, cfg.canvasWidth, 2, {
-            isStatic: true,
-            isSensor: true,
-            render: { fillStyle: 'rgba(255, 0, 123, 0.25)' }
-        });
-
-        Composite.add(engine.world, [ground, leftWall, rightWall, deadLine]);
-
-        // Collision Handler
-        Events.on(engine, 'collisionStart', (event) => {
-            const pairs = event.pairs;
-            for (let i = 0; i < pairs.length; i++) {
-                const pair = pairs[i];
-                if (pair.bodyA.label && pair.bodyB.label && 
-                    pair.bodyA.label.startsWith('fruit_') && pair.bodyB.label.startsWith('fruit_')) {
-                    
-                    const idxA = parseInt(pair.bodyA.label.split('_')[1]);
-                    const idxB = parseInt(pair.bodyB.label.split('_')[1]);
-
-                    if (idxA === idxB && idxA < FRUIT_CLASSES.length - 1) {
-                        if (pair.bodyA.isDead || pair.bodyB.isDead) continue;
-                        pair.bodyA.isDead = true;
-                        pair.bodyB.isDead = true;
-
-                        const posA = pair.bodyA.position;
-                        const posB = pair.bodyB.position;
-                        const midX = (posA.x + posB.x) / 2;
-                        const midY = (posA.y + posB.y) / 2;
-
-                        Composite.remove(engine.world, [pair.bodyA, pair.bodyB]);
-
-                        score += FRUIT_CLASSES[idxA].score;
-                        document.getElementById('score-val').textContent = String(score).padStart(6, '0');
-
-                        setTimeout(() => {
-                            const nextFruit = createFruit(midX, midY, idxA + 1);
-                            Composite.add(engine.world, nextFruit);
-                            addLog(`[CONVERGE] ${FRUIT_CLASSES[idxA].name} 융합 -> 단계 상승`, 'success');
-                        }, 25);
-                    }
-                }
-            }
-        });
-
-        // Game Over Verification Loop
-        setInterval(() => {
-            const bodies = Composite.allBodies(engine.world);
-            bodies.forEach(b => {
-                if (b.label && b.label.startsWith('fruit_') && !b.isStatic) {
-                    if (b.position.y < 130) {
-                        // 패널티 가중치가 높을 때 라인을 넘어가면 경고 발생
-                        if(!b.warned) {
-                            b.warned = true;
-                            addLog(`[ALERT] ${b.label.toUpperCase()} 임계 고도 돌파!`, 'danger');
-                        }
-                    }
-                }
-            });
-        }, 1000);
-    }
-
-    function createFruit(x, y, index, isStatic = false) {
-        const info = FRUIT_CLASSES[index];
-        const body = Bodies.circle(x, y, info.radius, {
-            label: `fruit_${index}`,
-            restitution: 0.25,
-            friction: 0.08,
-            density: 0.001,
+        return Bodies.circle(x, y, radius, {
             isStatic: isStatic,
+            label: `fruit_${level}`,
+            restitution: 0.28,
+            friction: 0.08,
+            density: 0.001 + (level * 0.0005),
             render: {
-                // 수박게임 서브 도면 이미지 바인딩 및 해상도 비율 크기 역조정(스케일링) 설정
+                // 기존 단순 fillStyle 색상 표현을 없애고 캐릭터 이미지로 완벽히 바인딩합니다.
                 sprite: {
-                    texture: info.image,
-                    xScale: (info.radius * 2) / IMAGE_BASE_SIZE,
-                    yScale: (info.radius * 2) / IMAGE_BASE_SIZE
+                    texture: `A${level + 1}.PNG`,
+                    xScale: (radius * 2) / IMAGE_SIZE,
+                    yScale: (radius * 2) / IMAGE_SIZE
                 }
             }
         });
-        return body;
     }
 
-    function getRandomFruitIndex() {
-        // 초반 난이도 조절을 위해 0~4단계 유닛만 스폰 가능하도록 설정
-        return Math.floor(Math.random() * 5);
+    function initPredictiveSpawn() {
+        nextFruitLevel = generateNextLevel();
+        spawnQueuedAnchor();
     }
 
-    function spawnNextFruit() {
-        const canvas = document.getElementById('game-canvas');
-        const defaultX = canvas.width / 2;
+    function spawnQueuedAnchor() {
+        if (currentFruitBody) return;
+        const rect = canvasWrap.getBoundingClientRect();
+        // Set standard center drop target area default location values
+        const spawnX = width / 2;
+        const spawnY = 60;
+
+        currentFruitBody = createFruitBody(spawnX, spawnY, nextFruitLevel, true);
+        Composite.add(world, currentFruitBody);
+    }
+
+    // Cursor Track listeners mapping inside boundaries
+    container.addEventListener('mouseenter', () => {
+        customCursor.style.display = 'block';
+        dropLine.style.display = 'block';
+    });
+
+    container.addEventListener('mouseleave', () => {
+        customCursor.style.display = 'none';
+        dropLine.style.display = 'none';
+    });
+
+    container.addEventListener('mousemove', (e) => {
+        const rect = canvasWrap.getBoundingClientRect();
+        let x = e.clientX - rect.left;
         
-        currentFruit = createFruit(defaultX, cfg.dropY, nextIndex, true);
-        Composite.add(engine.world, currentFruit);
+        // Boundaries checks clamping
+        const r = syncLevelToRadius(nextFruitLevel);
+        if (x < r) x = r;
+        if (x > width - r) x = width - r;
+
+        customCursor.style.left = `${x}px`;
+        dropLine.style.left = `${x}px`;
+
+        if (currentFruitBody && currentFruitBody.isStatic) {
+            Body.setPosition(currentFruitBody, { x: x, y: 60 });
+        }
+    });
+
+    container.addEventListener('mousedown', (e) => {
+        if (isCooldown || !currentFruitBody) return;
         
-        nextIndex = getRandomFruitIndex();
-        updatePreviewCanvas();
-    }
+        // Trigger timing evaluation sequence for metrics check
+        assessRhythmTiming();
 
-    function updatePreviewCanvas() {
-        const canvas = document.getElementById('next-preview-canvas');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        const info = FRUIT_CLASSES[nextIndex];
+        // Release physical object context configuration assignment mapping rule
+        Body.setStatic(currentFruitBody, false);
+        currentFruitBody = null;
         
-        // 미리보기 박스 전용 이미지 그리기 매핑 구현
-        const img = new Image();
-        img.src = info.image;
-        img.onload = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            // 캔버스 크기(80x80) 내부 규격에 맞춰 비율 크기 조정
-            const displaySize = Math.min(info.radius * 1.4, 46);
-            ctx.drawImage(img, canvas.width / 2 - displaySize / 2, canvas.height / 2 - displaySize / 2 - 6, displaySize, displaySize);
-            
-            ctx.fillStyle = '#d1f4ff';
-            ctx.font = '9px Share Tech Mono';
-            ctx.textAlign = 'center';
-            ctx.fillText(info.name, canvas.width / 2, canvas.height - 4);
-        };
+        isCooldown = true;
+        nextFruitLevel = generateNextLevel();
 
-        // 로드 전 폴백 기본 데이터 표현
-        ctx.beginPath();
-        ctx.arc(canvas.width / 2, canvas.height / 2 - 6, Math.min(info.radius, 20), 0, Math.PI * 2);
-        ctx.fillStyle = info.color;
-        ctx.fill();
-        ctx.fillStyle = '#d1f4ff';
-        ctx.font = '9px Share Tech Mono';
-        ctx.textAlign = 'center';
-        ctx.fillText(info.name, canvas.width / 2, canvas.height - 4);
-    }
+        setTimeout(() => {
+            isCooldown = false;
+            spawnQueuedAnchor();
+        }, cfg.spawnCooldown);
+    });
 
-    function setupInteraction() {
-        const centerPanel = document.getElementById('center-panel');
-        const canvas = document.getElementById('game-canvas');
-        const cursorEl = document.getElementById('custom-cursor');
-
-        centerPanel.addEventListener('mouseenter', () => { cursorEl.style.display = 'block'; });
-        centerPanel.addEventListener('mouseleave', () => { cursorEl.style.display = 'none'; });
-
-        centerPanel.addEventListener('mousemove', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            
-            // 전용 커서 컴포넌트 마운트 처리
-            cursorEl.style.left = e.clientX + 'px';
-            cursorEl.style.top = e.clientY + 'px';
-
-            if (currentFruit && currentFruit.isStatic) {
-                const radius = FRUIT_CLASSES[parseInt(currentFruit.label.split('_')[1])].radius;
-                // 벽 충돌 한계값 클램핑
-                let targetX = Math.max(radius + 5, Math.min(cfg.canvasWidth - radius - 5, mouseX));
-                Body.setPosition(currentFruit, { x: targetX, y: cfg.dropY });
+    // Rhythm Nodes Loop Engine ticker
+    let lastNodeTime = 0;
+    function pulseRhythmTracks(timestamp) {
+        if(!lastNodeTime) lastNodeTime = timestamp;
+        
+        // Generate node every 1.4 seconds interval pacing
+        if (timestamp - lastNodeTime > 1400) {
+            if (rhythmActive) {
+                // Random dynamic side entry spawn rule
+                const dir = Math.random() > 0.5 ? 'L' : 'R';
+                nodes.push({
+                    id: Date.now() + Math.random(),
+                    progress: 0, // 0 to 1 scaling metric value factor mapping sequence
+                    direction: dir,
+                    el: createNodeElement(dir)
+                });
             }
-        });
+            lastNodeTime = timestamp;
+        }
 
-        centerPanel.addEventListener('click', () => {
-            if (!currentFruit || !currentFruit.isStatic) return;
+        // Animate nodes array tracking calculations block loop loop operations execution phase
+        const barContainer = document.getElementById('rhythm-bar');
+        for (let i = nodes.length - 1; i >= 0; i--) {
+            const node = nodes[i];
+            node.progress += 0.007; // Core movement velocity step speed sequence parameter
 
-            // 리듬 싱크 시스템 판정 스코어 계산
-            syncTotal++;
-            const now = Date.now();
-            const timeSinceLastBeat = (now - lastBeatTime) % beatInterval;
-            const threshold = 140; // 판정 범위 (ms)
+            if (node.progress >= 1.0) {
+                // Out of bounds processing tracking node destruction
+                node.el.remove();
+                nodes.splice(i, 1);
+                
+                // Penalty logic rule trigger metrics processing values tracking block context update loop sequence
+                syncConsecutive = 0;
+                globalCost = Math.min(100, globalCost + cfg.costPenalty);
+                updateCostBar();
+                appendLog('SYNC', 'alert', 'Rhythm wavelength threshold missed. Stability damage incurred.');
+            } else {
+                // Compute element coordinate mapping offset positions inside interface container boundaries layout track context
+                // Node maps from target margins intersecting at center scale value (0.5 progress target zone alignment tracking)
+                let posPercent = 0;
+                if (node.direction === 'L') {
+                    posPercent = node.progress * 50;
+                } else {
+                    posPercent = 100 - (node.progress * 50);
+                }
+                node.el.style.left = `${posPercent}%`;
+            }
+        }
 
-            const isSync = (timeSinceLastBeat < threshold || (beatInterval - timeSinceLastBeat) < threshold);
-            handleSyncResult(isSync);
+        // Passive environmental structural decay tracking context state variable operations evaluation updates
+        updateEcosystemPools();
 
-            // 물리 시뮬레이션 적용 활성화 분리 처리
-            Body.setStatic(currentFruit, false);
-            currentFruit = null;
-
-            setTimeout(() => {
-                spawnNextFruit();
-            }, 650);
-        });
+        requestAnimationFrame(pulseRhythmTracks);
     }
 
-    function handleSyncResult(isSuccess) {
-        const resultEl = document.getElementById('sync-indicator');
-        const customCursor = document.getElementById('custom-cursor');
+    function createNodeElement(direction) {
+        const bar = document.getElementById('rhythm-bar');
+        const d = document.createElement('div');
+        d.className = 'rhythm-node';
+        if(direction === 'L') {
+            d.style.left = '0%';
+            d.style.background = 'var(--color-clinic)';
+            d.style.boxShadow = 'var(--glow-clinic)';
+        } else {
+            d.style.left = '100%';
+            d.style.background = 'var(--color-office)';
+            d.style.boxShadow = 'var(--glow-office)';
+        }
+        bar.appendChild(d);
+        return d;
+    }
 
-        if (isSuccess) {
+    function assessRhythmTiming() {
+        syncTotal++;
+        let optimalHit = false;
+        let targetedNodeIdx = -1;
+
+        // Iterate mapping metrics evaluations to isolate closest node elements alignment criteria validation match tracking
+        for (let i = 0; i < nodes.length; i++) {
+            // Target convergence alignment center threshold target points index calculation variable range constraints match check validation
+            const offset = Math.abs(nodeProgressToX(nodes[i]) - (width / 2));
+            // Perfect synchronization frame overlap window allowance margin zone definition threshold
+            if (offset < 26) { 
+                optimalHit = true;
+                targetedNodeIdx = i;
+                break;
+            }
+        }
+
+        const resultEl = document.getElementById('sync-pop');
+        if (optimalHit && targetedNodeIdx !== -1) {
             syncOk++;
             syncConsecutive++;
-            // 코스트 경감 및 보너스 수치 연계 연산
-            globalCost = Math.max(0, globalCost - 5);
-            updateCostBar();
             
-            document.getElementById('combo-val').textContent = `X ${syncConsecutive}`;
+            // Clean node reference values trace parameters
+            nodes[targetedNodeIdx].el.remove();
+            nodes.splice(targetedNodeIdx, 1);
 
-            const isCombo = syncConsecutive >= 3;
-            const gaugeGain = isCombo ? 2 : 1;
-            
-            customCursor.style.width = '45px';
-            customCursor.style.height = '45px';
-            setTimeout(() => { customCursor.style.width = '30px'; customCursor.style.height = '30px'; }, 80);
+            // Compute dynamic gains rewards modifiers based on operational constraints evaluations metrics statuses values configurations
+            const gaugeGain = Math.min(25, 8 + Math.floor(syncConsecutive / 2));
+            globalCost = Math.max(0, globalCost - cfg.costRecovery);
+            updateCostBar();
+
+            // Fire visual updates feedback parameters routines trigger mechanisms elements adjustments
+            const isCombo = syncConsecutive > 2;
+            customCursor.style.width = '42px';
+            customCursor.style.height = '42px';
+            setTimeout(() => { customCursor.style.width = '30px'; customCursor.style.height = '30px'; }, 120);
+
+            // Trigger flashes sequences animations mapping indicators layout arrays trackers elements fields updates
+            const timeline = document.getElementById('rhythm-bar');
+            timeline.style.borderColor = 'var(--color-clinic)';
+            setTimeout(() => { timeline.style.borderColor = 'var(--border-mid)'; }, 80);
 
             if (!isCombo) customCursor.style.boxShadow = '0 0 25px var(--color-clinic)';
             setTimeout(() => customCursor.style.boxShadow = '', 300);
-            
             resultEl.style.color = isCombo ? 'var(--color-office)' : 'var(--color-clinic)';
             resultEl.style.textShadow = isCombo ? '0 0 10px var(--color-office)' : '0 0 10px var(--color-clinic)';
             resultEl.textContent = isCombo ? `COMBO! +${gaugeGain}게이지` : 'SYNC 성공';
             resultEl.style.opacity = '1';
         } else {
             syncConsecutive = 0;
-            document.getElementById('combo-val').textContent = `X 0`;
             globalCost = Math.min(100, globalCost + cfg.costPenalty);
             updateCostBar();
-            
             customCursor.style.boxShadow = '0 0 20px var(--color-center)';
-            setTimeout(() => customCursor.style.boxShadow = '', 300);
-            
+            setTimeout(() => { customCursor.style.boxShadow = ''; }, 300);
             resultEl.style.color = 'var(--color-center)';
             resultEl.style.textShadow = '0 0 10px var(--color-center)';
             resultEl.textContent = '타이밍 미스';
@@ -682,47 +977,96 @@
         updateClinicStats();
     }
 
-    function updateClinicStats() {
-        const rate = syncTotal === 0 ? 100 : Math.round((syncOk / syncTotal) * 100);
-        document.getElementById('sync-rate-val').textContent = `${rate}%`;
+    function nodeProgressToX(node) {
+        // Translate node data parameters configuration tracks values coordinates mapping tracking metrics functions computations
+        const containerWidth = 380; // Matches CSS container elements definitions rule dimension values properties definitions
+        if (node.direction === 'L') {
+            return (node.progress * 0.5) * containerWidth;
+        } else {
+            return (1.0 - (node.progress * 0.5)) * containerWidth;
+        }
     }
 
     function updateCostBar() {
-        const bar = document.getElementById('cost-fill');
-        const txt = document.getElementById('cost-percent-val');
-        bar.style.width = `${globalCost}%`;
-        txt.textContent = `${Math.round(globalCost)}%`;
-    }
-
-    function addLog(text, type = 'system') {
-        const container = document.getElementById('log-container');
-        const entry = document.createElement('div');
-        entry.className = `log-entry ${type}`;
+        document.getElementById('txt-cost-penalty').textContent = `${globalCost} / 100`;
+        document.getElementById('bar-cost-penalty').style.width = `${globalCost}%`;
         
-        const now = new Date();
-        const timeStr = `[${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}]`;
+        if (globalCost >= 100) {
+            appendLog('CRITICAL', 'alert', 'Core stability completely exhausted. Purging matrix pipeline.');
+            // Implementation of wipe/reset sequences metrics calculations contexts evaluations counters arrays functions
+            globalCost = 0; 
+        }
+    }
+
+    function updateClinicStats() {
+        const rate = syncTotal === 0 ? 100 : Math.round(syncOk / syncTotal * 100);
+        document.getElementById('txt-sync-ratio').textContent = `${rate}%`;
+        document.getElementById('bar-sync-ratio').style.width = `${rate}%`;
+    }
+
+    let lastPoolUpdate = 0;
+    function updateEcosystemPools() {
+        // Random procedural variations mimicking grid stream telemetry packets fluctuations calculations data flows variables updates mapping values parameters definitions
+        const cVal = 45.0 + Math.sin(Date.now() / 600) * 8.2 + (syncConsecutive * 1.5);
+        const oVal = 22.4 + Math.cos(Date.now() / 400) * 5.1 - (globalCost * 0.2);
         
-        entry.textContent = `${timeStr} ${text}`;
-        container.appendChild(entry);
-        container.scrollTop = container.scrollHeight;
+        document.getElementById('val-clinic-pool').textContent = `${Math.max(0, Math.min(100, cVal)).toFixed(1)}%`;
+        document.getElementById('val-office-pool').textContent = `${Math.max(0, Math.min(100, oVal)).toFixed(1)}%`;
     }
 
-    function animateLoop() {
-        const now = Date.now();
-        if (now - lastBeatTime >= beatInterval) {
-            lastBeatTime = now;
+    // Handle Structural Collisions Merging Dynamics Iterations Rules Definitions Pipeline
+    Events.on(engine, 'collisionStart', (event) => {
+        const pairs = event.pairs;
+        
+        for (let i = 0; i < pairs.length; i++) {
+            const pair = pairs[i];
+            const labelA = pair.bodyA.label || '';
+            const labelB = pair.bodyB.label || '';
+
+            // Ensure processing applies strictly exclusively to interactive entities arrays components matches tracks indicators parameters
+            if (labelA.startsWith('fruit_') && labelB.startsWith('fruit_') && labelA === labelB) {
+                const currentLevel = parseInt(labelA.split('_')[1]);
+                
+                // Max level ceiling constraints checks validation barrier mapping rules bounds handling configurations tracking definitions components
+                if (currentLevel >= cfg.radii.length - 1) continue;
+
+                // Compute intercept midpoint target values positions elements parameters configuration settings variables logic track functions definitions
+                const posA = pair.bodyA.position;
+                const posB = pair.bodyB.position;
+                const midX = (posA.x + posB.x) / 2;
+                const midY = (posA.y + posB.y) / 2;
+
+                // Eliminate expired instances elements allocations fields parameters trackers references context loops mapping queues rules definitions fields components objects items data streams lists
+                Composite.remove(world, [pair.bodyA, pair.bodyB]);
+
+                // Construct higher state evolution iteration object node entity item instance reference configurations parameter specifications functions mappings values definitions arrays lists
+                const nextLevel = currentLevel + 1;
+                const upgradedFruit = createFruitBody(midX, midY, nextLevel);
+                
+                Composite.add(world, upgradedFruit);
+                appendLog('EVO', 'success', `Synthesized level fusion transition sequence matching tier branch element ID: [A${nextLevel + 1}.PNG]`);
+                break;
+            }
         }
+    });
 
-        // 오버히트 코스트 자연 감소 알고리즘 처리
-        if (globalCost > 0) {
-            globalCost = Math.max(0, globalCost - cfg.costDecay);
-            updateCostBar();
-        }
+    // Deadlock state scanner checking bounds compliance levels parameters limits components validations trackers
+    setInterval(() => {
+        const bodies = Composite.allBodies(world);
+        bodies.forEach(body => {
+            if (body.isStatic) return;
+            // Validate bounding elements thresholds allocations tracks offsets settings factors mapping values ranges variables
+            if (body.position.y < deadLineY && body.velocity.y.toFixed(2) === "0.00") {
+                // If it hits the limit condition loop, throw warning data logging line parameter update
+                appendLog('WARN', 'alert', 'Dangerous threshold overflow accumulation tracked. clear perimeter zone immediately.');
+            }
+        });
+    }, 2500);
 
-        requestAnimationFrame(animateLoop);
-    }
-
-    window.onload = init;
-</script>
+    // Bootstrap execution triggers initialisation sequences steps routines mapping parameters modules updates elements controls variables
+    initPredictiveSpawn();
+    requestAnimationFrame(pulseRhythmTracks);
+    appendLog('SYS', 'info', 'Sandbox canvas environment initialization mapping completely loaded and mapped.');
+    </script>
 </body>
 </html>
