@@ -1381,6 +1381,44 @@
 
 <script>
 // ============================================================
+// BGM AUDIO SETUP
+// ============================================================
+const bgm = new Audio();
+bgm.loop = true; // 무한 반복 재생
+
+// 각 탭의 ID와 재생할 mp3 파일 매핑 (GitHub Pages 연동을 위해 상대 경로 사용)
+const audioFiles = {
+    'mod-suika': './MARK CONDENSATION.mp3',
+    'mod-sim': './INCIDENT RESPONSE.mp3',
+    'mod-test': './ORG APTITUDE.mp3',
+    'mod-garden': './GARDEN RITE.mp3',
+    'mod-clinic': './COST RELIEF SYNC.mp3'
+};
+
+function playBgmForTab(tabId) {
+    if (audioFiles[tabId]) {
+        // 이미 같은 곡이 재생 중이 아닐 때만 src를 변경하고 재생
+        const newSrc = new URL(audioFiles[tabId], document.baseURI).href;
+        if (bgm.src !== newSrc) {
+            bgm.src = audioFiles[tabId];
+            bgm.play().catch(err => {
+                console.log("브라우저 정책에 의해 오디오 자동 재생이 차단되었습니다.", err);
+            });
+        }
+    }
+}
+
+// 브라우저의 자동재생 차단(Autoplay Policy)을 우회하기 위한 첫 클릭 이벤트
+// 사용자가 화면 아무 곳이나 처음 클릭했을 때 현재 열려있는 탭의 음악을 재생합니다.
+document.body.addEventListener('click', function initBgm() {
+    if (bgm.paused) {
+        const activeTab = document.querySelector('.module-panel.active').id;
+        playBgmForTab(activeTab);
+    }
+    document.body.removeEventListener('click', initBgm);
+}, { once: true });
+
+// ============================================================
 // UTILITIES
 // ============================================================
 const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -1513,6 +1551,9 @@ function triggerTab(e, id) {
     document.getElementById(id).classList.add('active');
     e.currentTarget.classList.add('active');
     if (id === 'mod-suika' && !suikaRunning) bootSuikaGame();
+
+    // 탭 변경 시 해당 메뉴에 맞는 오디오 재생
+    playBgmForTab(id);
 }
 
 // ============================================================
@@ -2044,7 +2085,7 @@ const DECEASED_DB = [
         lore: {
             surface: "SERIN: 그녀는 밀항 전 5년 격리 판정에 이의를 신청한 기록이 있다. OFFICE는 기각했다. 사인은 능력 부작용 — 체액이 내부에서 역방향으로 압축됐다.",
             hidden:  "SERIN: 컨테이너 일지에 따르면 CLINIC 수석 의사의 '완화 화합물 No.4'가 감염률과 능력 강도를 인위적으로 증폭시킨다. 코스트 억제 효과는 마크 가속화의 위장이다 — 연구 데이터를 위해 피험자가 폭주하도록 유도한 것이다.",
-            deep:    "SERIN: 그녀는 화합물 No.4의 가장 초기 피험자였다. CLINIC은 그녀가 COVE에 도착하기 전, 외부 감염 경로를 조작해 그녀를 표적으로 지정했다. 마크는 자연 감염이 아니었다. OFFICE 디렉터가 실험 승인 서명을 했다.",
+            deep:    "SERIN: 그녀는 화합물 No.4의 가장 초기 피험자였다. CLINIC은 그녀가 COVE에 도착하기 전, 외부 감염 경로를 조작해 그녀를 표적으로 지정했다. 마크는 자연 감염이 아니었다. OFFICE 디렉터가 실험 승인 서명을 정했다.",
             suffix: { A: " 일지는 재로 돌아간다.", B: " 익명 파일이 언더 구역 우편함에 도착한다.", C: " 진실을 읽는 것은 당신을 공범으로 만든다." }
         }
     },
