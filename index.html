@@ -87,7 +87,7 @@
             transition: opacity 1s ease;
         }
 
-        .loading-wrapper { width: 520px; }
+        .loading-wrapper { width: 520px; max-width: 90%; }
 
         .loading-title {
             font-family: var(--font-display);
@@ -150,6 +150,11 @@
             height: 1px;
             background: linear-gradient(90deg, transparent, var(--color-clinic), transparent);
             opacity: 0.4;
+        }
+
+        .header-brand-area {
+            display: flex;
+            align-items: center;
         }
 
         .brand-logo {
@@ -221,13 +226,13 @@
 
         /* ── CONTENT ── */
         .content-container {
-            flex: 1; position: relative; overflow: hidden;
+            flex: 1; position: relative; overflow-y: auto; overflow-x: hidden;
         }
 
         .module-panel {
             position: absolute; inset: 0;
             padding: 28px 32px;
-            display: none; overflow-y: auto;
+            display: none; overflow-y: auto; overflow-x: hidden;
         }
 
         .module-panel.active {
@@ -354,11 +359,14 @@
         #suika-workspace {
             align-items: center; justify-content: center;
             background: #020508;
+            overflow-x: auto;
+            touch-action: none; /* Prevent scrolling when dragging fruits on mobile */
         }
 
         #suika-canvas {
             display: block; cursor: none;
             background: radial-gradient(circle at 50% 30%, rgba(0,50,100,0.15) 0%, #020508 70%);
+            /* Mobile responsiveness for canvas handled in JS and Media Query */
         }
 
         .suika-hud-score {
@@ -376,7 +384,6 @@
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
             background: rgba(0,229,255,0.02);
-            position: relative;
         }
 
         .db-row-item {
@@ -904,7 +911,7 @@
         #custom-cursor::after  { left: 50%; top: -5px; bottom: -5px; width: 1px; }
 
         /* ── SCROLLBAR ── */
-        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--border-bright); }
@@ -1015,6 +1022,57 @@
             font-size: 9px; margin-top: 3px;
             opacity: 0.6;
         }
+
+        /* ── RESPONSIVE MOBILE LAYOUT ── */
+        @media (max-width: 850px) {
+            header {
+                height: auto;
+                padding: 12px 16px 0;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header-brand-area {
+                display: flex;
+                width: 100%;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 8px;
+            }
+            .status-pulse { margin-left: 0; }
+            .brand-tag { display: none; } /* 화면이 작아지면 태그 생략 */
+            .navigation-tabs {
+                width: 100%;
+                overflow-x: auto;
+                justify-content: flex-start;
+                -webkit-overflow-scrolling: touch;
+            }
+            .tab-trigger { padding: 8px 16px; margin-bottom: 4px; font-size: 11px; }
+
+            .module-panel { position: relative; inset: auto; min-height: 100%; padding: 16px; overflow: visible; }
+            .grid-layout { flex-direction: column; height: auto !important; min-height: 100%; }
+            #mod-clinic .grid-layout, #mod-garden .grid-layout { height: auto; }
+            
+            .side-hud-bar { width: 100%; flex-shrink: 0; height: max-content; max-height: 400px; overflow-y: auto; }
+            .main-workspace { height: 600px; min-height: 500px; flex: none; overflow-y: auto; }
+
+            .garden-split-view { flex-direction: column; height: auto; }
+            .garden-main-altar { border-right: none; border-bottom: 1px solid var(--border-dim); padding: 20px; }
+            .garden-split-view > div:last-child { width: 100% !important; height: auto; padding: 20px 16px; }
+
+            #suika-canvas { width: 100%; height: auto; max-width: 440px; aspect-ratio: 440/640; }
+            
+            .loading-wrapper { width: 90%; }
+            .dossier-result { padding: 24px; }
+            .dossier-stamp { top: 16px; right: 16px; transform: rotate(0deg); opacity: 0.4; }
+
+            /* 터치 친화적 UI 개선 */
+            .hud-action-btn { padding: 16px; font-size: 11px; }
+            #custom-cursor { display: none; } /* 모바일에서는 커서 숨김 */
+        }
+        @media (max-width: 400px) {
+            .pulse-core-ring-wrapper { transform: scale(0.7); }
+            .clinic-sync-btn { padding: 14px 40px; }
+        }
     </style>
 </head>
 <body>
@@ -1038,9 +1096,13 @@
 
 <div id="app-wrapper">
     <header>
-        <div class="brand-logo">COVE</div>
-        <div class="brand-tag">고립 구역 // 상태: <em>불안정</em></div>
-        <div class="status-pulse"></div>
+        <div class="header-brand-area">
+            <div style="display:flex; align-items:center;">
+                <div class="brand-logo">COVE</div>
+                <div class="brand-tag">고립 구역 // 상태: <em>불안정</em></div>
+            </div>
+            <div class="status-pulse"></div>
+        </div>
         <nav class="navigation-tabs">
             <button class="tab-trigger active" onclick="triggerTab(event,'mod-suika')">MARK CONDENSATION</button>
             <button class="tab-trigger" onclick="triggerTab(event,'mod-sim')">INCIDENT RESPONSE</button>
@@ -1470,17 +1532,6 @@ const SUIKA_UNITS = [
     { id:11, name:"GASOLINE",r:130, pts:66, color:"#00e676" },
 ];
 
-// SUIKA 이미지 프리로드 (A1.png ~ A11.png)
-const SUIKA_IMAGES = {};
-for(let i=1; i<=11; i++) {
-    const img = new Image();
-    img.src = `A${i}.png`;
-    img.onload = () => {
-        if (suikaRunning) drawNextPreview(); // 로드 완료시 미리보기 업데이트
-    };
-    SUIKA_IMAGES[i] = img;
-}
-
 let sEngine, sWorld, sRunner, sCanvas, sCtx;
 let sFruits = [], sScore = 0;
 let sCurLevel = 1, sNextLevel = 1;
@@ -1545,12 +1596,28 @@ function bootSuikaGame() {
     sNextLevel = Math.ceil(Math.random() * 3);
     drawNextPreview();
 
-    sCanvas.onmousemove = e => { const r = sCanvas.getBoundingClientRect(); sGhostX = e.clientX - r.left; };
-    sCanvas.onclick = e => {
+    // Responsive Canvas Coordinate Mapping
+    function getCanvasX(clientX) {
+        const r = sCanvas.getBoundingClientRect();
+        const scaleX = sCanvas.width / r.width;
+        return (clientX - r.left) * scaleX;
+    }
+
+    // Mouse Events
+    sCanvas.onmousemove = e => { sGhostX = getCanvasX(e.clientX); };
+    
+    // Touch Events for Mobile
+    sCanvas.addEventListener('touchmove', e => {
+        if (e.touches.length > 0) {
+            e.preventDefault(); // Prevents page scrolling while dragging
+            sGhostX = getCanvasX(e.touches[0].clientX);
+        }
+    }, { passive: false });
+
+    function dropFruit(clientX) {
         if (!sCanDrop || sGameOver) return;
         sCanDrop = false;
-        const r = sCanvas.getBoundingClientRect();
-        let cx = e.clientX - r.left;
+        let cx = getCanvasX(clientX);
         const rad = SUIKA_UNITS[sCurLevel-1].r;
         cx = Math.max(rad+4, Math.min(440-rad-4, cx));
 
@@ -1562,7 +1629,14 @@ function bootSuikaGame() {
         sNextLevel = Math.ceil(Math.random() * 4);
         drawNextPreview();
         setTimeout(() => { sCanDrop = true; }, 500);
-    };
+    }
+
+    sCanvas.onclick = e => { dropFruit(e.clientX); };
+    sCanvas.addEventListener('touchend', e => {
+        if (e.changedTouches.length > 0) {
+            dropFruit(e.changedTouches[0].clientX);
+        }
+    });
 
     sAnimId = requestAnimationFrame(renderSuika);
 }
@@ -1587,30 +1661,16 @@ function drawNextPreview() {
     const nx = nc.getContext('2d');
     nx.clearRect(0,0,60,60);
     const u = SUIKA_UNITS[sNextLevel-1];
-    
     // glow
     nx.shadowBlur = 14; nx.shadowColor = u.color;
     nx.fillStyle = u.color;
     nx.beginPath(); nx.arc(30,30,18,0,Math.PI*2); nx.fill();
     nx.shadowBlur = 0;
-
-    const img = SUIKA_IMAGES[sNextLevel];
-    if (img && img.complete) {
-        nx.save();
-        nx.beginPath();
-        nx.arc(30, 30, 17, 0, Math.PI * 2);
-        nx.clip();
-        nx.drawImage(img, 13, 13, 34, 34);
-        nx.restore();
-    } else {
-        // 이미지가 로드되지 않았거나 없을 경우 텍스트 fallback
-        nx.fillStyle = '#fff'; nx.font = 'bold 10px Share Tech Mono';
-        nx.textAlign = 'center'; nx.textBaseline = 'middle';
-        nx.fillText(u.name.substring(0,3), 30, 30);
-    }
-
     nx.strokeStyle = 'rgba(255,255,255,0.5)'; nx.lineWidth = 1;
     nx.beginPath(); nx.arc(30,30,18,0,Math.PI*2); nx.stroke();
+    nx.fillStyle = '#fff'; nx.font = 'bold 10px Share Tech Mono';
+    nx.textAlign = 'center'; nx.textBaseline = 'middle';
+    nx.fillText(u.name.substring(0,3), 30, 30);
 }
 
 function renderSuika() {
@@ -1631,26 +1691,11 @@ function renderSuika() {
         sCtx.setLineDash([3,5]);
         sCtx.beginPath(); sCtx.moveTo(tx,45); sCtx.lineTo(tx,640); sCtx.stroke();
         sCtx.setLineDash([]);
-        
         const u = SUIKA_UNITS[sCurLevel-1];
         sCtx.shadowBlur = 10; sCtx.shadowColor = u.color;
-        
-        const img = SUIKA_IMAGES[sCurLevel];
-        if (img && img.complete) {
-            sCtx.globalAlpha = 0.5;
-            sCtx.save();
-            sCtx.beginPath();
-            sCtx.arc(tx, 45, rad * 0.95, 0, Math.PI*2);
-            sCtx.clip();
-            sCtx.drawImage(img, tx - rad * 0.95, 45 - rad * 0.95, rad * 1.9, rad * 1.9);
-            sCtx.restore();
-            sCtx.globalAlpha = 1;
-        } else {
-            sCtx.fillStyle = u.color; sCtx.globalAlpha = 0.4;
-            sCtx.beginPath(); sCtx.arc(tx,45,rad,0,Math.PI*2); sCtx.fill();
-            sCtx.globalAlpha = 1;
-        }
-        sCtx.shadowBlur = 0;
+        sCtx.fillStyle = u.color; sCtx.globalAlpha = 0.4;
+        sCtx.beginPath(); sCtx.arc(tx,45,rad,0,Math.PI*2); sCtx.fill();
+        sCtx.globalAlpha = 1; sCtx.shadowBlur = 0;
     }
 
     let rampage = false;
@@ -1660,37 +1705,29 @@ function renderSuika() {
         sCtx.save();
         sCtx.translate(f.position.x, f.position.y);
         sCtx.rotate(f.angle);
-        
         // glow
         sCtx.shadowBlur = 12; sCtx.shadowColor = u.color;
         sCtx.fillStyle = u.color;
         sCtx.beginPath(); sCtx.arc(0,0,u.r,0,Math.PI*2); sCtx.fill();
         sCtx.shadowBlur = 0;
-
-        const img = SUIKA_IMAGES[f.gameLvl];
-        
-        if (sUnlockedLevels.has(f.gameLvl) && img && img.complete) {
-            // 이미지 렌더링 (원형 클리핑)
-            sCtx.save();
-            sCtx.beginPath();
-            sCtx.arc(0, 0, u.r * 0.95, 0, Math.PI * 2);
-            sCtx.clip();
-            sCtx.drawImage(img, -u.r * 0.95, -u.r * 0.95, u.r * 1.9, u.r * 1.9);
-            sCtx.restore();
-        } else if (!sUnlockedLevels.has(f.gameLvl)) {
-            // 미해금 시 ? 표시 유지
-            sCtx.strokeStyle = 'rgba(255,255,255,0.3)'; sCtx.lineWidth = 1;
-            sCtx.beginPath(); sCtx.arc(0,0,u.r*0.65,0,Math.PI*2); sCtx.stroke();
-            sCtx.fillStyle = 'rgba(255,255,255,0.35)';
-            sCtx.font = `700 ${Math.max(8, u.r*0.38)}px Share Tech Mono`;
-            sCtx.textAlign = 'center'; sCtx.textBaseline = 'middle';
-            sCtx.fillText('???', 0, 0);
-        }
-
         // outer ring - bright and thick
         sCtx.strokeStyle = 'rgba(255,255,255,0.92)'; sCtx.lineWidth = 2.2;
         sCtx.beginPath(); sCtx.arc(0,0,u.r,0,Math.PI*2); sCtx.stroke();
-        
+        // inner ring
+        sCtx.strokeStyle = 'rgba(255,255,255,0.3)'; sCtx.lineWidth = 1;
+        sCtx.beginPath(); sCtx.arc(0,0,u.r*0.65,0,Math.PI*2); sCtx.stroke();
+        // label
+        sCtx.fillStyle = '#fff';
+        sCtx.font = `700 ${Math.max(9, u.r*0.45)}px Share Tech Mono`;
+        sCtx.textAlign = 'center'; sCtx.textBaseline = 'middle';
+        if (sUnlockedLevels.has(f.gameLvl)) {
+            const nameShort = u.name.length > 6 ? u.name.substring(0,6) : u.name;
+            sCtx.fillText(nameShort, 0, 0);
+        } else {
+            sCtx.fillStyle = 'rgba(255,255,255,0.35)';
+            sCtx.font = `700 ${Math.max(8, u.r*0.38)}px Share Tech Mono`;
+            sCtx.fillText('???', 0, 0);
+        }
         sCtx.restore();
 
         if (f.position.y - u.r < 95 && now - f.settledTime > 1500 && Math.abs(f.velocity.y) < 0.15) rampage = true;
@@ -1733,7 +1770,7 @@ const SCENARIOS = [
                 costDelta: -20
             },
             {
-                text: "[OFFICE 전용] 1km 경계를 봉쇄하고, 하모니 본부에 행정 타격대를 요청한다.",
+                text: "[OFFICE 전용] 1km 경계를 봉쇄하고, OFFICE 본부에 행정 타격대를 요청한다.",
                 reqOrg: "OFFICE",
                 outcome: "프로토콜 준수 격리 확립. CENTER 본대가 도착해 아이들을 수습하기 전까지 하이브 구역이 일부 구조적 피해를 입는다. 에이전트 코스트는 완전 통제.",
                 costDelta: 5
@@ -1991,7 +2028,7 @@ const DECEASED_DB = [
         lore: {
             surface: "HAN YIGYEOL: 소멸 직전, 그는 외해로 연결되는 부항구 지하 터널 설계도를 GARDEN에 전달했다. OFFICE는 깨끗한 폭주사로 공식 처리했다.",
             hidden:  "HAN YIGYEOL: CENTER의 내부 집행 명령서가 확인됐다 — 그는 폭주로 죽은 것이 아니다. 지하 터널 설계도의 출처를 추적한 OFFICE가 '침묵 집행'을 승인했고, CENTER 캡틴 하나가 직접 처리했다.",
-            deep:    "HAN YIGYEOL: 설계도는 미끼였다. 그가 진짜로 GARDEN에 넘긴 유산은 마크 바이러스의 최초 발생지 좌표가 담긴 암호화 필름이다. 현재 GARDEN 키퍼의 금고 가장 깊은 칸에 있다. OFFICE는 그 존재를 모른다.",
+            deep:    "HAN YIGYEOL: 설계도는 미끼였다. 그가 진짜로 GARDEN에 넘긴 것은 마크 바이러스의 최초 발생지 좌표가 담긴 암호화 필름이다. 현재 GARDEN 키퍼의 금고 가장 깊은 칸에 있다. OFFICE는 그 존재를 모른다.",
             suffix: { A: " — 기억은 당신 안에서 타오른다.", B: " — 데이터베이스 기록 완료. 파일 ID: HY-20-VERDE.", C: " — 연기 속에서 진실이 사라진다." }
         }
     },
@@ -2118,7 +2155,7 @@ const DECEASED_DB = [
         ],
         lore: {
             surface: "AIKO: 언더 구역 격리실 12호에서 발견 당시, 물리적 흔적이 일절 남아있지 않았다. CLINIC 공식 기록: 원인불명 자연 소실. 코스트 방출로 추정.",
-            hidden:  "AIKO: 원인불명 소실의 실체는 CLINIC이 개발한 '마크 역전이' 실험 중 발생한 피험자 소실이다. 마크 바이러스를 강제로 역방향 전이시켜 능력을 제거하는 것이 목표였다 — 부작용으로 피험자의 신체 물질이 완전히 분해됐다. 실험은 계속 중이다.",
+            hidden:  "AIKO: 원인불명 소실의 실체는 CLINIC이 개발한 '마크 역전이 정제' 실험 중 발생한 피험자 소실이다. 마크 바이러스를 강제로 역방향 전이시켜 능력을 제거하는 것이 목표였다 — 부작용으로 피험자의 신체 물질이 완전히 분해됐다. 실험은 계속 중이다.",
             deep:    "AIKO: 그녀는 실험에 자원한 것이 아니었다. 역전이 실험 대상자는 CLINIC이 언더 구역에서 무작위로 선발한다 — 선발 기준은 '외부 연결망이 없는 감염자'다. 성공할 경우 마크 치료제로 공표할 예정이지만, 실패한 피험자들의 기록은 전부 소각된다. COVE 전체 감염자 중 17명이 이미 소실됐다.",
             suffix: { A: " 흔적이 없어도 GARDEN은 기억한다.", B: " 존재했다는 사실이 가장 강력한 증거다.", C: " 사라진 방식이 다음 사람의 경고가 된다." }
         }
@@ -2423,7 +2460,7 @@ function updateSpeedUI() {
             <span id="clinic-event-subtitle" style="font-size:12px; letter-spacing:6px; color:var(--color-clinic);">SYNC THRESHOLD REACHED</span>
         </div>
         <div id="clinic-event-body" style="
-            max-width:580px; padding:28px 36px;
+            max-width:90%; width: 580px; padding:28px 36px;
             border:1px solid rgba(0,229,255,0.3);
             background:rgba(0,15,30,0.85);
             font-family:var(--font-mono); font-size:12px;
