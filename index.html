@@ -16,2719 +16,713 @@
             --border-mid: rgba(80, 160, 255, 0.22);
             --border-bright: rgba(80, 160, 255, 0.5);
 
-            --text-primary: #c8deff;
-            --text-muted: #4a6a9a;
-            --text-bright: #e8f4ff;
+            --text-primary: #d1f4ff;
+            --text-secondary: #7faec4;
 
-            --color-office:  #f0b429;
-            --color-center:  #ff5252;
-            --color-clinic:  #00e5ff;
-            --color-garden:  #00e676;
-
-            --glow-office:   0 0 20px rgba(240,180,41,0.4);
-            --glow-center:   0 0 20px rgba(255,82,82,0.4);
-            --glow-clinic:   0 0 20px rgba(0,229,255,0.4);
-            --glow-garden:   0 0 20px rgba(0,230,118,0.4);
-
-            --font-display: 'Orbitron', sans-serif;
-            --font-mono: 'Share Tech Mono', monospace;
-            --font-body: 'Noto Sans KR', sans-serif;
-            --font-ui: 'Space Grotesk', sans-serif;
+            --color-clinic: #00f0ff;
+            --color-office: #ff007b;
+            --color-center: #ffaa00;
         }
 
-        *, *::before, *::after {
+        * {
             box-sizing: border-box;
-            margin: 0; padding: 0;
+            margin: 0;
+            padding: 0;
+            font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif;
             user-select: none;
         }
 
-        html, body {
-            background: var(--bg-deep);
+        body {
+            background-color: var(--bg-deep);
             color: var(--text-primary);
-            font-family: var(--font-body);
-            height: 100vh;
             overflow: hidden;
-        }
-
-        /* ── AMBIENT ── */
-        #ambient-canvas {
-            position: fixed; inset: 0;
-            pointer-events: none; z-index: 1;
-        }
-
-        .scanline-overlay {
-            position: fixed; inset: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 3px,
-                rgba(0,0,0,0.07) 3px,
-                rgba(0,0,0,0.07) 4px
-            );
-            pointer-events: none; z-index: 9998;
-        }
-
-        /* chromatic aberration vignette */
-        .vignette-overlay {
-            position: fixed; inset: 0;
-            background: radial-gradient(ellipse at center,
-                transparent 40%,
-                rgba(0,5,20,0.7) 100%);
-            pointer-events: none; z-index: 9997;
-        }
-
-        /* ── LOADING ── */
-        #loading-screen {
-            position: fixed; inset: 0;
-            background: #020408;
-            z-index: 10000;
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            transition: opacity 1s ease;
-        }
-
-        .loading-wrapper { width: 520px; max-width: 90%; }
-
-        .loading-title {
-            font-family: var(--font-display);
-            font-size: 26px; font-weight: 900;
-            letter-spacing: 8px; color: #fff;
-            text-align: center; margin-bottom: 4px;
-            text-shadow: 0 0 30px rgba(80,160,255,0.8), 0 0 60px rgba(80,160,255,0.3);
-        }
-
-        .loading-subtitle {
-            font-family: var(--font-mono);
-            font-size: 11px; color: var(--text-muted);
-            text-align: center; margin-bottom: 40px;
-            letter-spacing: 3px;
-        }
-
-        .loading-bar-container {
-            width: 100%; height: 1px;
-            background: rgba(80,160,255,0.1);
-            margin-bottom: 20px; position: relative;
-        }
-
-        .loading-bar-fill {
-            height: 100%; width: 0%;
-            background: linear-gradient(90deg, transparent, var(--color-clinic), transparent);
-            background-size: 200% 100%;
-            box-shadow: 0 0 12px var(--color-clinic);
-            transition: width 0.05s linear;
-        }
-
-        .loading-logs {
-            font-family: var(--font-mono);
-            font-size: 11px; color: var(--text-muted);
-            height: 130px; overflow: hidden; line-height: 1.7;
-        }
-
-        .loading-logs .active-log { color: var(--color-clinic); }
-
-        /* ── APP SHELL ── */
-        #app-wrapper {
-            position: relative; width: 100vw; height: 100vh;
-            z-index: 2; display: flex; flex-direction: column;
-            opacity: 0; transition: opacity 1.2s ease;
-        }
-
-        /* ── HEADER ── */
-        header {
-            height: 64px; flex-shrink: 0;
-            border-bottom: 1px solid var(--border-mid);
-            background: rgba(4,8,18,0.95);
-            backdrop-filter: blur(20px);
-            display: flex; align-items: center;
-            padding: 0 32px; gap: 0;
+            width: 100vw;
+            height: 100vh;
             position: relative;
         }
 
-        header::after {
+        body::before {
             content: '';
-            position: absolute; bottom: 0; left: 0; right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--color-clinic), transparent);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 6px 100%;
+            z-index: 999;
+            pointer-events: none;
             opacity: 0.4;
         }
 
-        .header-brand-area {
+        .terminal-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            gap: 15px;
+        }
+
+        .header-panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-mid);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.05);
+            position: relative;
+        }
+
+        .header-panel::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: 10%; width: 80%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--color-clinic), transparent);
+        }
+
+        .status-node {
             display: flex;
             align-items: center;
+            gap: 10px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
         }
 
-        .brand-logo {
-            font-family: var(--font-display);
-            font-size: 18px; font-weight: 900;
-            letter-spacing: 5px; color: #fff;
-            text-shadow: 0 0 20px rgba(80,160,255,0.6);
-            margin-right: 24px; white-space: nowrap;
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background-color: var(--color-clinic);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--color-clinic);
+            animation: blink 1.5s infinite alternate;
         }
 
-        .brand-tag {
-            font-family: var(--font-mono);
-            font-size: 10px; color: var(--text-muted);
-            border-left: 1px solid var(--border-dim);
-            padding-left: 20px; letter-spacing: 2px;
-            white-space: nowrap;
+        @keyframes blink {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
         }
 
-        .brand-tag em { color: var(--color-clinic); font-style: normal; }
-
-        /* live pulse dot */
-        .status-pulse {
-            width: 7px; height: 7px; border-radius: 50%;
-            background: var(--color-garden);
-            box-shadow: 0 0 8px var(--color-garden);
-            margin-left: 16px;
-            animation: pulseDot 2s ease-in-out infinite;
-            flex-shrink: 0;
-        }
-        @keyframes pulseDot {
-            0%,100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.3; transform: scale(0.7); }
+        .terminal-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
         }
 
-        /* ── NAV TABS ── */
-        .navigation-tabs {
-            margin-left: auto;
-            display: flex; height: 100%;
+        .time-stamp {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--color-office);
         }
 
-        .tab-trigger {
-            background: transparent; border: none;
-            color: var(--text-muted);
-            font-family: var(--font-display);
-            font-size: 10px; font-weight: 600;
-            letter-spacing: 2px; padding: 0 22px;
-            border-bottom: 2px solid transparent;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            position: relative; white-space: nowrap;
-        }
-
-        .tab-trigger::before {
-            content: '';
-            position: absolute; bottom: 2px; left: 50%; right: 50%;
-            height: 2px; background: var(--color-clinic);
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px var(--color-clinic);
-        }
-
-        .tab-trigger:hover { color: var(--text-primary); }
-        .tab-trigger:hover::before { left: 20%; right: 20%; }
-
-        .tab-trigger.active {
-            color: var(--text-bright);
-            border-bottom-color: var(--color-clinic);
-        }
-        .tab-trigger.active::before { left: 0; right: 0; }
-
-        /* ── CONTENT ── */
-        .content-container {
-            flex: 1; position: relative; overflow-y: auto; overflow-x: hidden;
-        }
-
-        .module-panel {
-            position: absolute; inset: 0;
-            padding: 28px 32px;
-            display: none; overflow-y: auto; overflow-x: hidden;
-        }
-
-        .module-panel.active {
-            display: block;
-            animation: paneFadeIn 0.5s ease forwards;
-        }
-
-        @keyframes paneFadeIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ── LAYOUT GRID ── */
         .grid-layout {
-            display: flex; gap: 24px;
-            height: calc(100vh - 64px - 56px);
-            max-width: 1600px; margin: 0 auto;
-        }
-
-        /* ── PANELS ── */
-        .side-hud-bar {
-            width: 300px; flex-shrink: 0;
-            background: var(--bg-panel);
-            border: 1px solid var(--border-dim);
-            backdrop-filter: blur(16px);
-            padding: 22px;
-            display: flex; flex-direction: column; gap: 22px;
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.3), 0 0 0 0.5px rgba(80,160,255,0.05);
-        }
-
-        .side-hud-bar::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--border-bright), transparent);
-        }
-
-        .main-workspace {
+            display: grid;
+            grid-template-columns: 320px 1fr 340px;
             flex: 1;
+            gap: 15px;
+            min-height: 0;
+        }
+
+        .side-panel {
             background: var(--bg-panel);
+            border: 1px solid var(--border-mid);
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .center-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(4, 8, 16, 0.5);
             border: 1px solid var(--border-dim);
-            backdrop-filter: blur(16px);
             position: relative;
-            display: flex; flex-direction: column;
             overflow: hidden;
         }
 
-        /* ── SECTION HEADERS ── */
-        .section-header {
-            font-family: var(--font-display);
-            font-size: 10px; font-weight: 700;
-            letter-spacing: 3px; color: var(--color-clinic);
-            border-bottom: 1px solid var(--border-dim);
-            padding-bottom: 10px; margin-bottom: 8px;
-            display: flex; justify-content: space-between; align-items: center;
-            text-shadow: 0 0 10px rgba(0,229,255,0.3);
+        .panel-header {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-mid);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            background: rgba(8, 20, 38, 0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .section-header .count {
-            font-family: var(--font-mono);
-            font-size: 10px; color: var(--text-muted);
+        .log-container {
+            flex: 1;
+            padding: 15px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            color: var(--text-secondary);
         }
 
-        /* ── TERMINAL COLORS ── */
-        .sys-msg   { color: var(--text-muted); }
-        .alert-msg { color: var(--color-center); text-shadow: 0 0 8px rgba(255,82,82,0.4); }
-        .heal-msg  { color: var(--color-clinic); }
-        .garden-msg { color: var(--color-garden); }
-
-        /* ── BUTTONS ── */
-        .hud-action-btn {
-            width: 100%;
-            background: transparent;
-            border: 1px solid var(--border-mid);
-            color: var(--text-bright);
-            font-family: var(--font-display);
-            font-size: 10px; font-weight: 700;
-            padding: 13px; letter-spacing: 2px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            position: relative; overflow: hidden;
+        .log-entry {
+            line-height: 1.3;
+            border-left: 2px solid transparent;
+            padding-left: 6px;
         }
 
-        .hud-action-btn::before {
-            content: '';
-            position: absolute; inset: 0;
-            background: linear-gradient(135deg, transparent 40%, rgba(80,160,255,0.06));
-            opacity: 0; transition: opacity 0.25s;
+        .log-entry.system { border-color: var(--color-clinic); color: var(--text-primary); }
+        .log-entry.success { border-color: var(--color-clinic); color: var(--color-clinic); }
+        .log-entry.warning { border-color: var(--color-center); color: var(--color-center); }
+        .log-entry.danger { border-color: var(--color-office); color: var(--color-office); }
+
+        .stat-box {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        .hud-action-btn:hover {
-            border-color: var(--color-clinic);
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px dashed var(--border-dim);
+            padding-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
             color: var(--color-clinic);
-            box-shadow: 0 0 15px rgba(0,229,255,0.2), inset 0 0 15px rgba(0,229,255,0.05);
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
         }
 
-        .hud-action-btn:hover::before { opacity: 1; }
-
-        .hud-action-btn:disabled {
-            opacity: 0.25; cursor: not-allowed;
+        .stat-value.alt {
+            color: var(--color-office);
+            text-shadow: 0 0 8px rgba(255, 0, 123, 0.2);
         }
 
-        /* corner bracket effect */
-        .bracket-box {
-            position: relative; padding: 20px;
-        }
-        .bracket-box::before, .bracket-box::after {
-            content: '';
-            position: absolute;
-            width: 14px; height: 14px;
-        }
-        .bracket-box::before {
-            top: 0; left: 0;
-            border-top: 1px solid var(--border-bright);
-            border-left: 1px solid var(--border-bright);
-        }
-        .bracket-box::after {
-            bottom: 0; right: 0;
-            border-bottom: 1px solid var(--border-bright);
-            border-right: 1px solid var(--border-bright);
-        }
-
-        /* ── MODULE 1: SUIKA ── */
-        #suika-workspace {
-            align-items: center; justify-content: center;
-            background: #020508;
-            overflow-x: auto;
-            touch-action: none; /* Prevent scrolling when dragging fruits on mobile */
-        }
-
-        #suika-canvas {
-            display: block; cursor: none;
-            background: radial-gradient(circle at 50% 30%, rgba(0,50,100,0.15) 0%, #020508 70%);
-            /* Mobile responsiveness for canvas handled in JS and Media Query */
-        }
-
-        .suika-hud-score {
-            font-family: var(--font-display);
-            font-size: 44px; font-weight: 900;
-            color: #fff;
-            text-shadow: 0 0 30px rgba(0,229,255,0.5), 0 0 60px rgba(0,229,255,0.2);
-            line-height: 1;
-        }
-
-        .next-preview-box {
-            width: 90px; height: 90px;
-            border: 1px dashed var(--border-mid);
-            margin: 12px auto;
-            border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            background: rgba(0,229,255,0.02);
-        }
-
-        .db-row-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 7px 8px;
-            border-bottom: 1px solid rgba(80,160,255,0.04);
-            font-size: 11px;
-            transition: background 0.2s;
-        }
-        .db-row-item:hover { background: rgba(80,160,255,0.04); }
-
-        .db-circle-color {
-            width: 11px; height: 11px;
-            border-radius: 50%; flex-shrink: 0;
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 0 6px currentColor;
-        }
-
-        .db-name {
-            flex: 1; font-family: var(--font-mono);
-            font-size: 11px; color: var(--text-primary);
-        }
-
-        .db-pts { color: var(--text-muted); font-size: 10px; font-family: var(--font-mono); }
-
-        .suika-gameover-overlay {
-            position: absolute; inset: 0;
-            background: rgba(2,4,10,0.95);
-            display: none; flex-direction: column;
-            justify-content: center; align-items: center;
-            z-index: 100; gap: 18px;
-        }
-
-        .glitch-title {
-            font-family: var(--font-display);
-            font-size: 30px; font-weight: 900;
-            color: var(--color-center);
-            letter-spacing: 6px;
-            text-shadow: 0 0 20px rgba(255,82,82,0.7);
-            animation: glitchAnim 0.3s infinite;
-        }
-
-        @keyframes glitchAnim {
-            0%   { transform: translate(0); clip-path: none; }
-            25%  { transform: translate(-2px, 1px); }
-            50%  { transform: translate(2px, -1px); }
-            75%  { transform: translate(-1px, 2px); }
-            100% { transform: translate(0); }
-        }
-
-        /* ── MODULE 2: SIMULATOR ── */
-        .terminal-screen {
-            flex: 1;
-            background: rgba(2,5,12,0.7);
-            border-bottom: 1px solid var(--border-dim);
-            padding: 28px;
-            font-family: var(--font-mono);
-            font-size: 12px; line-height: 2;
-            overflow-y: auto; white-space: pre-wrap;
-        }
-
-        .hud-cost-container {
-            border-bottom: 1px solid var(--border-dim);
-            padding: 16px 24px;
-            background: rgba(0,0,0,0.3);
-        }
-
-        .hud-cost-label {
-            display: flex; justify-content: space-between;
-            font-size: 10px; letter-spacing: 2px;
-            margin-bottom: 10px; color: var(--text-muted);
-            font-family: var(--font-display);
-        }
-
-        .hud-cost-track {
-            height: 3px;
-            background: rgba(80,160,255,0.08);
-            position: relative; overflow: hidden;
-        }
-
-        .hud-cost-fill {
-            height: 100%; width: 0%;
-            background: var(--color-clinic);
-            box-shadow: 0 0 10px var(--color-clinic);
-            transition: width 0.4s ease, background-color 0.4s ease;
-        }
-
-        .choice-list-wrapper {
-            padding: 20px 24px;
-            display: flex; flex-direction: column; gap: 10px;
-            background: rgba(0,0,0,0.2);
-        }
-
-        .interactive-choice-btn {
-            background: transparent;
-            border: 1px solid var(--border-dim);
-            color: var(--text-primary);
-            padding: 14px 20px;
-            text-align: left;
-            font-family: var(--font-body);
-            font-size: 12px; letter-spacing: 0.5px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .interactive-choice-btn::before {
-            content: '▶';
-            font-size: 8px; color: var(--color-clinic);
-            margin-right: 10px; opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .interactive-choice-btn:hover:not(.disabled-node) {
-            border-color: var(--border-bright);
-            background: rgba(80,160,255,0.04);
-            padding-left: 28px;
-            box-shadow: inset 3px 0 0 var(--color-clinic);
-        }
-
-        .interactive-choice-btn:hover::before { opacity: 1; }
-
-        .interactive-choice-btn.disabled-node {
-            color: var(--text-muted);
-            border-style: dashed;
-            cursor: not-allowed; opacity: 0.5;
-        }
-
-        /* sim selects */
-        .sim-select {
-            background: rgba(4,8,20,0.9);
-            border: 1px solid var(--border-dim);
-            color: var(--text-primary);
-            padding: 10px 12px;
-            font-family: var(--font-mono);
-            font-size: 11px; width: 100%;
-            transition: border-color 0.2s;
-        }
-        .sim-select:focus {
-            outline: none;
-            border-color: var(--color-clinic);
-            box-shadow: 0 0 10px rgba(0,229,255,0.15);
-        }
-
-        label.sim-label {
-            font-size: 9px; letter-spacing: 2px;
-            color: var(--text-muted); font-family: var(--font-display);
-            display: block; margin-bottom: 6px;
-        }
-
-        /* ── MODULE 3: APTITUDE ── */
-        .aptitude-flow-box {
-            max-width: 680px; margin: 30px auto; width: 100%;
-        }
-
-        .aptitude-card {
-            border: 1px solid var(--border-dim);
-            background: var(--bg-panel);
-            padding: 44px;
-            display: none;
-            position: relative; overflow: hidden;
-        }
-
-        .aptitude-card::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--color-clinic), transparent);
-        }
-
-        .aptitude-card.active {
-            display: block; animation: paneFadeIn 0.5s ease;
-        }
-
-        .aptitude-question {
-            font-family: var(--font-ui);
-            font-size: 16px; line-height: 1.7;
-            margin-bottom: 32px; color: var(--text-bright);
-            font-weight: 500;
-        }
-
-        .aptitude-option {
-            width: 100%;
-            background: transparent;
-            border: 1px solid var(--border-dim);
-            color: var(--text-primary);
-            padding: 15px 20px;
-            text-align: left;
-            font-family: var(--font-body);
-            font-size: 13px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .aptitude-option:hover {
-            border-color: var(--color-clinic);
-            background: rgba(0,229,255,0.04);
-            color: var(--text-bright);
-            box-shadow: inset 3px 0 0 var(--color-clinic);
-            padding-left: 28px;
-        }
-
-        .dossier-result {
-            display: none;
-            border: 1px solid var(--border-mid);
-            background: rgba(4,8,20,0.95);
-            padding: 48px; position: relative;
-            box-shadow: 0 0 60px rgba(0,229,255,0.05);
-        }
-
-        .dossier-result::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--color-clinic), transparent);
-        }
-
-        .dossier-stamp {
-            position: absolute; top: 36px; right: 36px;
-            font-family: var(--font-display);
-            font-size: 10px; border: 1px solid;
-            padding: 9px 18px;
-            letter-spacing: 4px; opacity: 0.75;
-            transform: rotate(12deg);
-        }
-
-        .dossier-title {
-            font-family: var(--font-display);
-            font-size: 38px; font-weight: 900;
-            margin-bottom: 6px; letter-spacing: 4px;
-        }
-
-        .dossier-subtitle {
-            font-family: var(--font-mono);
-            font-size: 11px; color: var(--text-muted);
-            letter-spacing: 4px; margin-bottom: 28px;
-        }
-
-        .dossier-body {
-            font-size: 13px; line-height: 2;
-            color: #9ab4d4; margin-bottom: 32px;
-        }
-
-        /* ── MODULE 4: GARDEN ── */
-        .garden-split-view {
-            display: flex; gap: 0; height: 100%;
-        }
-
-        .deceased-row {
-            border: 1px solid var(--border-dim);
-            padding: 16px 18px; cursor: pointer;
-            background: rgba(255,255,255,0.01);
-            transition: all 0.2s ease; margin-bottom: 8px;
-        }
-
-        .deceased-row:hover {
-            background: rgba(0,230,118,0.04);
-            border-color: rgba(0,230,118,0.25);
-        }
-
-        .deceased-row.selected {
-            background: rgba(0,230,118,0.07);
-            border-color: var(--color-garden);
-            box-shadow: inset 3px 0 0 var(--color-garden);
-        }
-
-        .deceased-name {
-            font-family: var(--font-display);
-            font-size: 12px; color: var(--text-bright);
-            margin-bottom: 5px; letter-spacing: 2px;
-        }
-
-        .deceased-meta {
-            font-size: 10px; color: var(--text-muted);
-            letter-spacing: 0.5px; font-family: var(--font-mono);
-            line-height: 1.5;
-        }
-
-        .garden-main-altar {
-            flex: 1;
+        #game-canvas {
+            background: #020408;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 240, 255, 0.03);
+            border-left: 1px solid var(--border-dim);
             border-right: 1px solid var(--border-dim);
-            background: rgba(2,5,10,0.5);
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            position: relative; padding: 40px; gap: 28px;
         }
 
-        .garden-main-altar::before {
-            content: '';
-            position: absolute; inset: 0;
-            background: radial-gradient(circle at center, rgba(0,230,118,0.04) 0%, transparent 60%);
-            pointer-events: none;
-        }
-
-        .incinerator-box {
-            width: 240px; height: 240px;
-            border: 1px solid var(--border-mid);
-            position: relative; display: flex;
-            justify-content: center; align-items: center;
-            background: radial-gradient(circle at center, rgba(0,230,118,0.05) 0%, transparent 70%);
-        }
-
-        /* corner brackets on incinerator */
-        .incinerator-box::before, .incinerator-box::after {
-            content: '';
-            position: absolute;
-            width: 20px; height: 20px;
-        }
-        .incinerator-box::before { top: -1px; left: -1px; border-top: 2px solid var(--color-garden); border-left: 2px solid var(--color-garden); }
-        .incinerator-box::after  { bottom: -1px; right: -1px; border-bottom: 2px solid var(--color-garden); border-right: 2px solid var(--color-garden); }
-
-        .flower-node-graphic {
-            width: 56px; height: 56px;
-            border: 2px solid var(--color-garden);
-            transform: rotate(45deg);
-            box-shadow: 0 0 20px rgba(0,230,118,0.4), inset 0 0 20px rgba(0,230,118,0.1);
-            transition: all 0.5s ease;
-        }
-
-        .flower-node-graphic.burning {
-            animation: flowerBurn 1.5s infinite linear;
-        }
-
-        @keyframes flowerBurn {
-            0%   { transform: rotate(45deg) scale(1); box-shadow: 0 0 20px rgba(0,230,118,0.4); }
-            33%  { transform: rotate(135deg) scale(0.85); box-shadow: 0 0 40px rgba(255,82,82,0.7); }
-            66%  { transform: rotate(225deg) scale(1.1); box-shadow: 0 0 60px rgba(240,180,41,0.6); }
-            100% { transform: rotate(315deg) scale(1); box-shadow: 0 0 20px rgba(0,230,118,0.4); }
-        }
-
-        .lore-reveal-window {
-            font-family: var(--font-mono);
-            font-size: 12px; line-height: 1.9;
-            color: var(--text-muted); min-height: 80px;
-        }
-
-        .lore-reveal-window strong {
-            color: var(--color-garden); display: block;
-            margin-bottom: 10px; letter-spacing: 2px;
-        }
-
-        /* flower btns */
-        .flower-btn {
+        .cost-bar-container {
             width: 100%;
-            background: transparent;
+            height: 6px;
+            background: rgba(0, 0, 0, 0.5);
             border: 1px solid var(--border-dim);
-            color: var(--text-primary);
-            font-family: var(--font-mono);
-            font-size: 11px; padding: 12px 16px;
-            text-align: left; cursor: pointer;
-            transition: all 0.2s; letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            margin-top: 5px;
+            overflow: hidden;
         }
 
-        .flower-btn:hover {
-            border-color: var(--color-garden);
-            color: var(--color-garden);
-            background: rgba(0,230,118,0.05);
+        .cost-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--color-clinic), var(--color-office));
+            transition: width 0.3s ease;
         }
 
-        .flower-btn.selected-flower {
-            border-color: var(--color-garden);
-            color: var(--color-garden);
-            background: rgba(0,230,118,0.08);
-            box-shadow: inset 3px 0 0 var(--color-garden);
-        }
-
-        /* ── MODULE 5: CLINIC ── */
-        .clinic-sync-workspace {
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            height: 100%; gap: 50px;
-            background: radial-gradient(circle at 50% 40%, rgba(0,229,255,0.04) 0%, transparent 60%);
-            position: relative;
-        }
-
-        .clinic-arena-label {
-            font-family: var(--font-display);
-            font-size: 9px; letter-spacing: 4px;
-            color: var(--text-muted);
-            position: absolute; top: 24px;
-        }
-
-        .pulse-core-ring-wrapper {
-            width: 320px; height: 320px;
-            position: relative;
-            display: flex; justify-content: center; align-items: center;
-        }
-
-        /* rotating scanner lines */
-        .pulse-scanner {
-            position: absolute; inset: 0;
-            border-radius: 50%;
-            border: 1px solid rgba(0,229,255,0.06);
-            animation: scanRotate 8s linear infinite;
-        }
-        .pulse-scanner::after {
-            content: '';
-            position: absolute; top: 50%; left: 50%; right: 50%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(0,229,255,0.4));
-            transform-origin: 0 50%;
-            width: 50%;
-        }
-
-        @keyframes scanRotate { to { transform: rotate(360deg); } }
-
-        .pulse-target-zone {
+        .sync-indicator {
             position: absolute;
-            width: 150px; height: 150px;
-            border: 2px dashed rgba(0,229,255,0.35);
-            border-radius: 50%;
-            box-shadow: inset 0 0 30px rgba(0,229,255,0.06),
-                        0 0 30px rgba(0,229,255,0.06);
-        }
-
-        /* target zone inner rings */
-        .pulse-target-zone::before, .pulse-target-zone::after {
-            content: '';
-            position: absolute; border-radius: 50%; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            border: 1px solid rgba(0,229,255,0.1);
-        }
-        .pulse-target-zone::before { width: 90%; height: 90%; }
-        .pulse-target-zone::after  { width: 70%; height: 70%; }
-
-        .pulse-expanding-ring {
-            position: absolute;
-            width: 10px; height: 10px;
-            border: 2px solid var(--color-clinic);
-            border-radius: 50%; opacity: 0;
+            top: 25px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 900;
             pointer-events: none;
-        }
-
-        /* hit flash ring */
-        .pulse-hit-flash {
-            position: absolute;
-            width: 150px; height: 150px;
-            border-radius: 50%;
-            border: 3px solid var(--color-clinic);
             opacity: 0;
-            pointer-events: none;
-        }
-
-        .clinic-sync-btn {
-            background: transparent;
-            border: 1px solid var(--color-clinic);
-            color: var(--color-clinic);
-            font-family: var(--font-display);
-            font-size: 12px; font-weight: 700;
-            padding: 18px 60px;
-            letter-spacing: 4px; cursor: pointer;
-            transition: all 0.15s ease;
-            box-shadow: 0 0 20px rgba(0,229,255,0.15);
-            position: relative; overflow: hidden;
+            transition: opacity 0.1s ease;
             z-index: 10;
         }
 
-        .clinic-sync-btn::before {
-            content: '';
-            position: absolute; inset: 0;
-            background: var(--color-clinic);
-            transform: translateY(100%);
-            transition: transform 0.15s ease;
-            z-index: -1;
-        }
-
-        .clinic-sync-btn:hover {
-            color: #000;
-            box-shadow: 0 0 40px rgba(0,229,255,0.5);
-        }
-        .clinic-sync-btn:hover::before { transform: translateY(0); }
-
-        .clinic-sync-btn:active {
-            transform: scale(0.97);
-        }
-
-        .clinic-sync-stats-box {
-            font-family: var(--font-mono);
-            font-size: 11px; color: var(--text-muted);
-            letter-spacing: 2px; text-align: center;
-        }
-
-        /* sync result flash */
-        .sync-result-display {
-            position: absolute; bottom: 80px;
-            font-family: var(--font-display);
-            font-size: 14px; letter-spacing: 3px;
-            font-weight: 700; opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.1s;
-        }
-
-        /* ── GLOBAL COST BAR (fixed overlay) ── */
-        #global-cost-bar {
-            position: fixed; top: 64px; right: 0; left: 0;
-            height: 3px; z-index: 500;
-            background: transparent; pointer-events: none;
-        }
-        #global-cost-fill {
-            height: 100%; width: 40%;
-            background: var(--color-clinic);
-            box-shadow: 0 0 8px var(--color-clinic);
-            transition: width 0.4s ease, background 0.4s ease;
-        }
-
-        /* ── CUSTOM CURSOR ── */
-        #custom-cursor {
-            position: fixed;
-            width: 26px; height: 26px;
-            border: 1px solid rgba(0,229,255,0.5);
+        .custom-cursor {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--color-clinic);
             border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%, -50%);
-            z-index: 100000;
-            transition: width 0.1s, height 0.1s, box-shadow 0.2s;
+            z-index: 100;
+            display: none;
+            box-sizing: border-box;
+            transition: width 0.1s, height 0.1s, box-shadow 0.3s;
         }
-        #custom-cursor::before, #custom-cursor::after {
+
+        .custom-cursor::before {
             content: '';
             position: absolute;
-            background: rgba(0,229,255,0.6);
-        }
-        #custom-cursor::before { top: 50%; left: -5px; right: -5px; height: 1px; }
-        #custom-cursor::after  { left: 50%; top: -5px; bottom: -5px; width: 1px; }
-
-        /* ── SCROLLBAR ── */
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--border-bright); }
-
-        /* ── RESPONSIVE grid for mod-clinic/garden ── */
-        #mod-clinic .grid-layout,
-        #mod-garden .grid-layout {
-            height: calc(100vh - 64px - 56px);
+            top: 50%; left: 50%;
+            width: 4px; height: 4px;
+            background: var(--color-clinic);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
         }
 
-        /* ── DIFFICULTY SELECTOR (CLINIC) ── */
-        .diff-selector-group {
-            display: flex; flex-direction: column; gap: 6px; margin-top: 10px;
-        }
-        .diff-btn {
-            background: transparent;
-            border: 1px solid var(--border-dim);
-            color: var(--text-muted);
-            font-family: var(--font-display);
-            font-size: 9px; font-weight: 700;
-            padding: 10px 14px; text-align: left;
-            cursor: pointer; letter-spacing: 2px;
-            transition: all 0.2s ease;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .diff-btn:hover { border-color: var(--color-clinic); color: var(--color-clinic); background: rgba(0,229,255,0.04); }
-        .diff-btn.diff-active { border-color: var(--color-clinic); color: var(--color-clinic); background: rgba(0,229,255,0.08); box-shadow: inset 3px 0 0 var(--color-clinic); }
-        .diff-btn.diff-active.d-runaway { border-color: var(--color-center); color: var(--color-center); background: rgba(255,82,82,0.08); box-shadow: inset 3px 0 0 var(--color-center); }
-        .diff-btn.diff-active.d-critical { border-color: var(--color-office); color: var(--color-office); background: rgba(240,180,41,0.06); box-shadow: inset 3px 0 0 var(--color-office); }
-        .diff-tier-badge {
-            font-family: var(--font-mono);
-            font-size: 9px; padding: 2px 7px;
-            border: 1px solid currentColor;
-            opacity: 0.6; letter-spacing: 1px;
-        }
-        .sync-wave-display {
-            font-family: var(--font-display);
-            font-size: 10px; letter-spacing: 3px;
-            color: var(--text-muted); text-align: center;
-            margin-top: 6px;
-        }
-        .sync-wave-display span { color: var(--color-clinic); }
-        .combo-flash-text {
-            position: absolute; top: 30px;
-            font-family: var(--font-display);
-            font-size: 11px; letter-spacing: 4px;
-            color: var(--color-office);
-            text-shadow: 0 0 15px var(--color-office);
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.1s;
-        }
-        .sync-speed-bar-wrap {
-            height: 3px; background: rgba(255,255,255,0.04);
-            margin-top: 5px; overflow: hidden;
-        }
-        .sync-speed-bar {
-            height: 100%; background: var(--color-clinic);
-            box-shadow: 0 0 6px var(--color-clinic);
-            transition: width 0.5s ease, background 0.3s;
-        }
-
-        /* ── GARDEN RITUAL CHOICE ── */
-        .ritual-question-area {
-            display: none; flex-direction: column; gap: 10px;
-            border: 1px solid rgba(0,230,118,0.2);
-            background: rgba(0,230,118,0.03);
-            padding: 16px;
+        .next-preview-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px dashed var(--border-mid);
+            margin: 15px;
+            height: 100px;
             position: relative;
         }
-        .ritual-question-area::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--color-garden), transparent);
-        }
-        .ritual-question-area.visible { display: flex; animation: paneFadeIn 0.4s ease; }
-        .ritual-q-label {
-            font-family: var(--font-display);
-            font-size: 9px; letter-spacing: 3px;
-            color: var(--color-garden); margin-bottom: 4px;
-        }
-        .ritual-q-text {
-            font-family: var(--font-mono);
-            font-size: 11px; color: var(--text-primary);
-            line-height: 1.7;
-        }
-        .ritual-opt-btn {
-            background: transparent;
-            border: 1px solid var(--border-dim);
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            font-size: 11px; padding: 10px 14px;
-            text-align: left; cursor: pointer;
-            transition: all 0.2s;
-        }
-        .ritual-opt-btn:hover { border-color: var(--color-garden); color: var(--color-garden); background: rgba(0,230,118,0.05); }
-        .ritual-opt-btn.selected-ritual { border-color: var(--color-garden); color: var(--color-garden); background: rgba(0,230,118,0.09); box-shadow: inset 3px 0 0 var(--color-garden); }
-        .garden-tier-indicator {
-            font-family: var(--font-mono);
-            font-size: 10px; letter-spacing: 2px;
-            padding: 6px 12px; border: 1px solid;
-            display: inline-block; margin-top: 4px;
-        }
-        .tier-surface { border-color: rgba(0,230,118,0.4); color: var(--color-garden); }
-        .tier-hidden  { border-color: rgba(240,180,41,0.5); color: var(--color-office); }
-        .tier-deep    { border-color: rgba(255,82,82,0.5); color: var(--color-center); }
-        .flower-tier-hint {
-            font-family: var(--font-mono);
-            font-size: 9px; margin-top: 3px;
-            opacity: 0.6;
+
+        .next-preview-label {
+            position: absolute;
+            top: 5px; left: 8px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-family: 'Share Tech Mono', monospace;
         }
 
-        /* ── AUDIO CONTROLS (ADDED) ── */
-        .audio-controls {
-            display: flex; align-items: center; gap: 10px;
-            margin-left: 30px; padding-left: 30px;
-            border-left: 1px solid var(--border-dim);
-        }
-        .audio-btn {
-            background: transparent; border: 1px solid var(--border-mid);
-            color: var(--text-primary); border-radius: 4px;
-            padding: 4px 8px; cursor: pointer;
-            font-size: 12px; transition: all 0.2s;
-        }
-        .audio-btn:hover {
-            border-color: var(--color-clinic); color: var(--color-clinic);
-            box-shadow: 0 0 8px rgba(0,229,255,0.3);
-        }
-        .audio-slider {
-            -webkit-appearance: none; appearance: none;
-            width: 70px; height: 4px; background: rgba(80,160,255,0.2);
-            outline: none; border-radius: 2px;
-        }
-        .audio-slider::-webkit-slider-thumb {
-            -webkit-appearance: none; appearance: none;
-            width: 12px; height: 12px; background: var(--color-clinic);
-            border-radius: 50%; cursor: pointer;
-            box-shadow: 0 0 8px var(--color-clinic);
+        #next-preview-canvas {
+            width: 80px;
+            height: 80px;
         }
 
-        /* ── RESPONSIVE MOBILE LAYOUT ── */
-        @media (max-width: 850px) {
-            header {
-                height: auto;
-                padding: 12px 16px 0;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .header-brand-area {
-                display: flex;
-                width: 100%;
-                align-items: center;
-                justify-content: space-between;
-                margin-bottom: 8px;
-            }
-            .status-pulse { margin-left: 0; }
-            .brand-tag { display: none; } /* 화면이 작아지면 태그 생략 */
-            .audio-controls { margin-left: 0; padding-left: 0; border-left: none; margin-bottom: 10px; width: 100%; justify-content: flex-end; }
-            .navigation-tabs {
-                width: 100%;
-                overflow-x: auto;
-                justify-content: flex-start;
-                -webkit-overflow-scrolling: touch;
-            }
-            .tab-trigger { padding: 8px 16px; margin-bottom: 4px; font-size: 11px; }
-
-            .module-panel { position: relative; inset: auto; min-height: 100%; padding: 16px; overflow: visible; }
-            .grid-layout { flex-direction: column; height: auto !important; min-height: 100%; }
-            #mod-clinic .grid-layout, #mod-garden .grid-layout { height: auto; }
-            
-            .side-hud-bar { width: 100%; flex-shrink: 0; height: max-content; max-height: 400px; overflow-y: auto; }
-            .main-workspace { height: 600px; min-height: 500px; flex: none; overflow-y: auto; }
-
-            .garden-split-view { flex-direction: column; height: auto; }
-            .garden-main-altar { border-right: none; border-bottom: 1px solid var(--border-dim); padding: 20px; }
-            .garden-split-view > div:last-child { width: 100% !important; height: auto; padding: 20px 16px; }
-
-            #suika-canvas { width: 100%; height: auto; max-width: 440px; aspect-ratio: 440/640; }
-            
-            .loading-wrapper { width: 90%; }
-            .dossier-result { padding: 24px; }
-            .dossier-stamp { top: 16px; right: 16px; transform: rotate(0deg); opacity: 0.4; }
-
-            /* 터치 친화적 UI 개선 */
-            .hud-action-btn { padding: 16px; font-size: 11px; }
-            #custom-cursor { display: none; } /* 모바일에서는 커서 숨김 */
-        }
-        @media (max-width: 400px) {
-            .pulse-core-ring-wrapper { transform: scale(0.7); }
-            .clinic-sync-btn { padding: 14px 40px; }
-        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-mid); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--border-bright); }
     </style>
 </head>
 <body>
 
-<div id="custom-cursor"></div>
-<div class="scanline-overlay"></div>
-<div class="vignette-overlay"></div>
-<canvas id="ambient-canvas"></canvas>
-<div id="global-cost-bar"><div id="global-cost-fill"></div></div>
+<div class="custom-cursor" id="custom-cursor"></div>
 
-<div id="loading-screen">
-    <div class="loading-wrapper">
-        <div class="loading-title">COVE // ARCHIVE</div>
-        <div class="loading-subtitle">RESTRICTED INTELLIGENCE SYNC PROTOCOL // CODE_0942</div>
-        <div class="loading-bar-container">
-            <div class="loading-bar-fill" id="load-fill"></div>
+<div class="terminal-container">
+    <header class="header-panel">
+        <div class="status-node">
+            <div class="status-indicator"></div>
+            <span>SYS_STATUS: ACTIVE // SECURE_NODE_5</span>
         </div>
-        <div class="loading-logs" id="load-logs"></div>
-    </div>
-</div>
-
-<div id="app-wrapper">
-    <header>
-        <div class="header-brand-area">
-            <div style="display:flex; align-items:center;">
-                <div class="brand-logo">COVE</div>
-                <div class="brand-tag">고립 구역 // 상태: <em>불안정</em></div>
-            </div>
-            <div class="status-pulse"></div>
-        </div>
-        
-        <div class="audio-controls">
-            <button id="bgm-toggle" class="audio-btn" onclick="toggleBgm()">🔊 ON</button>
-            <input type="range" id="bgm-volume" class="audio-slider" min="0" max="1" step="0.05" value="0.5" oninput="changeVolume(this.value)">
-        </div>
-
-        <nav class="navigation-tabs">
-            <button class="tab-trigger active" onclick="triggerTab(event,'mod-suika')">MARK CONDENSATION</button>
-            <button class="tab-trigger" onclick="triggerTab(event,'mod-sim')">INCIDENT RESPONSE</button>
-            <button class="tab-trigger" onclick="triggerTab(event,'mod-test')">ORG APTITUDE</button>
-            <button class="tab-trigger" onclick="triggerTab(event,'mod-garden')">GARDEN RITE</button>
-            <button class="tab-trigger" onclick="triggerTab(event,'mod-clinic')">COST RELIEF SYNC</button>
-        </nav>
+        <h1 class="terminal-title">COVE ARCHIVE TERMINAL</h1>
+        <div class="time-stamp" id="time-stamp">00:00:00 // UTC</div>
     </header>
 
-    <div class="content-container">
+    <div class="grid-layout">
+        <aside class="side-panel">
+            <div class="panel-header">
+                <span>SYSTEM ACTIVITY LOG</span>
+                <span style="color: var(--color-clinic)">v5.0.2</span>
+            </div>
+            <div class="log-container" id="log-container">
+                <div class="log-entry system">[SYSTEM] COVE 아카이브 터미널 엔진 초기화 완료.</div>
+                <div class="log-entry system">[SYSTEM] 물리 처리용 서브시스템 연결 성공.</div>
+                <div class="log-entry warning">[WARNING] 싱크로율 유실 위험 감지됨. 정밀 조정 요망.</div>
+            </div>
+        </aside>
 
-        <div id="mod-suika" class="module-panel active">
-            <div class="grid-layout">
-                <div class="side-hud-bar" style="position:relative;">
-                    <div>
-                        <div class="section-header">누적 흔적 TRACE</div>
-                        <div class="suika-hud-score" id="suika-current-score">0</div>
-                        <div style="font-family:var(--font-mono); font-size:10px; color:var(--text-muted); margin-top:6px; letter-spacing:1px;">융합 포인트</div>
-                    </div>
-                    <div>
-                        <div class="section-header">다음 마크 등급</div>
-                        <div class="next-preview-box">
-                            <canvas id="suika-next-canvas" width="60" height="60"></canvas>
-                        </div>
-                    </div>
-                    <div style="flex:1; overflow-y:auto;">
-                        <div class="section-header">마크 데이터베이스 <span class="count">11 GRADES</span></div>
-                        <div id="mark-db-list"></div>
-                    </div>
+        <main class="center-panel" id="center-panel">
+            <div class="sync-indicator" id="sync-indicator">SYNC 성공</div>
+            <canvas id="game-canvas"></canvas>
+        </main>
+
+        <aside class="side-panel">
+            <div class="panel-header">
+                <span>DIAGNOSTIC METERS</span>
+            </div>
+            
+            <div class="next-preview-box">
+                <div class="next-preview-label">NEXT_CORE_GEN</div>
+                <canvas id="next-preview-canvas" width="80" height="80"></canvas>
+            </div>
+
+            <div class="stat-box">
+                <div class="stat-row">
+                    <span class="stat-label">TOTAL EXTRACTED SCORE</span>
+                    <span class="stat-value" id="score-val">000,000</span>
                 </div>
-
-                <div class="main-workspace" id="suika-workspace">
-                    <canvas id="suika-canvas" width="440" height="640"></canvas>
-                    <div class="suika-gameover-overlay" id="suika-go-panel">
-                        <div class="glitch-title">CRITICAL RAMPAGE</div>
-                        <div style="font-size:11px; color:var(--text-muted); letter-spacing:2px; text-align:center; font-family:var(--font-mono); max-width:340px; line-height:1.8;">
-                            마크 제어 임계값 초과<br>
-                            능력치 급등 — 국지 재해 상태 전환 중<br>
-                            CENTER 진압 프로토콜로 이관
-                        </div>
-                        <button class="hud-action-btn" style="max-width:220px;" onclick="bootSuikaGame()">시스템 재부팅</button>
+                <div class="stat-row">
+                    <span class="stat-label">STREAK SYNC COMBO</span>
+                    <span class="stat-value alt" id="combo-val">X 0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">SYNC RATE PER UNIT</span>
+                    <span class="stat-value" id="sync-rate-val">100%</span>
+                </div>
+                <div>
+                    <span class="stat-label" style="display:flex; justify-content:space-between; font-size:0.75rem;">
+                        <span>OVERHEAT IMMERSION PENALTY</span>
+                        <span id="cost-percent-val" style="color: var(--color-office)">0%</span>
+                    </span>
+                    <div class="cost-bar-container">
+                        <div class="cost-fill" id="cost-fill"></div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div id="mod-sim" class="module-panel">
-            <div class="grid-layout">
-                <div class="side-hud-bar">
-                    <div>
-                        <div class="section-header">에이전트 프로필</div>
-                        <div style="display:flex; flex-direction:column; gap:16px; margin-top:8px;">
-                            <div>
-                                <label class="sim-label">소속</label>
-                                <select id="sim-input-org" class="sim-select">
-                                    <option value="CENTER">CENTER // 진압부대</option>
-                                    <option value="OFFICE">OFFICE // 행정통제국</option>
-                                    <option value="CLINIC">CLINIC // 마크연구소</option>
-                                    <option value="GARDEN">GARDEN // 정보거래소</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="sim-label">위험 등급</label>
-                                <select id="sim-input-rank" class="sim-select">
-                                    <option value="S">S CLASS — 최고 핵심 자산</option>
-                                    <option value="A" selected>A CLASS — 엘리트 자산</option>
-                                    <option value="B">B CLASS — 표준 자산</option>
-                                    <option value="C">C CLASS — 통제 자산</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="sim-label">전술 프로토콜</label>
-                                <select id="sim-input-role" class="sim-select">
-                                    <option value="SUPPRESS">진압 프로토콜</option>
-                                    <option value="ANCHOR">고정 프로토콜 (ANCHOR)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="hud-action-btn" onclick="initiateScenarioDispatch()">▶ 작전 투입</button>
-                    <div style="margin-top:auto; font-size:11px; color:var(--text-muted); line-height:1.8; font-family:var(--font-mono);">
-                        경고: 에이전트 프로필에 따라 선택지가 달라집니다. 코스트 100% 도달 시 강제 격리가 발동됩니다.
-                    </div>
-                </div>
-
-                <div class="main-workspace">
-                    <div class="hud-cost-container">
-                        <div class="hud-cost-label">
-                            <span>에이전트 코스트 소모량</span>
-                            <span id="sim-cost-display-text">0%</span>
-                        </div>
-                        <div class="hud-cost-track">
-                            <div class="hud-cost-fill" id="sim-cost-fill-bar"></div>
-                        </div>
-                    </div>
-                    <div class="terminal-screen" id="sim-terminal-output">
-                        <span class="sys-msg">>> COVE 사건 대응 터미널 준비 완료
->> 에이전트 프로필을 선택하고 투입을 눌러 작전을 개시하세요
->> 모든 선택은 전체 코스트 부담에 영향을 미칩니다
-</span>
-                    </div>
-                    <div class="choice-list-wrapper" id="sim-choice-container"></div>
-                </div>
-            </div>
-        </div>
-
-        <div id="mod-test" class="module-panel">
-            <div class="aptitude-flow-box">
-                <div id="test-intro-box" style="text-align:center; padding:40px 0;">
-                    <div style="font-family:var(--font-display); font-size:22px; letter-spacing:6px; margin-bottom:16px; color:#fff; text-shadow: 0 0 20px rgba(0,229,255,0.4);">소속 적성 검사</div>
-                    <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted); line-height:2; margin-bottom:36px; max-width:500px; margin-left:auto; margin-right:auto;">
-                        국제 협약 제42조에 따라 —<br>
-                        COVE 내 마크 감염자 전원은<br>
-                        최적의 조직 배치를 위한<br>
-                        심리 프로파일링을 받아야 합니다.
-                    </div>
-                    <button class="hud-action-btn" style="max-width:240px; margin:0 auto;" onclick="startAptitudeTest()">검사 프로토콜 개시</button>
-                </div>
-
-                <div id="test-qa-area"></div>
-
-                <div id="test-result-dossier" class="dossier-result">
-                    <div class="dossier-stamp" id="dossier-stamp-color">APPROVED</div>
-                    <div style="font-family:var(--font-mono); font-size:9px; color:var(--text-muted); letter-spacing:4px; margin-bottom:12px;">COVE 보안 파일 // 기밀</div>
-                    <div class="dossier-title" id="dossier-org-title">OFFICE</div>
-                    <div class="dossier-subtitle" id="dossier-rank-title">배정 직책</div>
-                    <div class="dossier-body" id="dossier-body-text"></div>
-                    <button class="hud-action-btn" style="max-width:200px;" onclick="resetAptitudeTest()">재검사 프로토콜</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="mod-garden" class="module-panel">
-            <div class="grid-layout">
-                <div class="side-hud-bar">
-                    <div class="section-header">오늘의 프로필 <span class="count" id="garden-profile-count">0</span></div>
-                    <div style="flex:1; overflow-y:auto;" id="garden-profile-list"></div>
-                </div>
-
-                <div class="main-workspace">
-                    <div class="garden-split-view">
-                        <div class="garden-main-altar">
-                            <div style="font-family:var(--font-display); font-size:9px; letter-spacing:4px; color:var(--text-muted);">GARDEN 추모 제단</div>
-                            <div class="incinerator-box">
-                                <div class="flower-node-graphic" id="altar-flower-node"></div>
-                            </div>
-                            <div id="garden-tier-badge" style="display:none;"></div>
-                            <button class="hud-action-btn" id="burn-ritual-btn" style="max-width:260px;" disabled onclick="executeFlowerBurning()">오늘의 꽃 태우기 // 정보 봉인</button>
-                        </div>
-
-                        <div style="width:400px; padding:28px; display:flex; flex-direction:column; gap:18px; background:rgba(0,0,0,0.2); overflow-y:auto;">
-                            <div>
-                                <div class="section-header">꽃 선택 <span class="count">TIER</span></div>
-                                <div style="margin-top:10px;">
-                                    <button class="flower-btn" onclick="selectFlowerType('Gypsophila','surface')">
-                                        GYPSOPHILA (안개꽃)
-                                        <div class="flower-tier-hint" style="color:var(--color-garden);">▸ 표면 기밀 해제 // 정보 거래 의사 표현</div>
-                                    </button>
-                                    <button class="flower-btn" onclick="selectFlowerType('Lily','surface')">
-                                        WHITE LILY (백합)
-                                        <div class="flower-tier-hint" style="color:var(--color-garden);">▸ 표면 기밀 해제 // 고인의 개인적 마지막 흔적</div>
-                                    </button>
-                                    <button class="flower-btn" onclick="selectFlowerType('Black Rose','hidden')">
-                                        BLACK ROSE (흑장미)
-                                        <div class="flower-tier-hint" style="color:var(--color-office);">▸ 심층 기밀 해제 // 조직 내 음모와 배신</div>
-                                    </button>
-                                    <button class="flower-btn" onclick="selectFlowerType('Forget-Me-Not','hidden')">
-                                        FORGET-ME-NOT (물망초)
-                                        <div class="flower-tier-hint" style="color:var(--color-office);">▸ 심층 기밀 해제 // 기억과 코스트에 새겨진 진실</div>
-                                    </button>
-                                    <button class="flower-btn" onclick="selectFlowerType('Narcissus','deep')">
-                                        NARCISSUS (수선화)
-                                        <div class="flower-tier-hint" style="color:var(--color-center);">▸ 봉인 기밀 해제 // 마크와 2세대의 숨겨진 기원</div>
-                                    </button>
-                                    <button class="flower-btn" onclick="selectFlowerType('Dried Wisteria','deep')">
-                                        DRIED WISTERIA (말린 등나무)
-                                        <div class="flower-tier-hint" style="color:var(--color-center);">▸ 봉인 기밀 해제 // COVE 설립 이전의 금지된 기록</div>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div id="ritual-question-panel" class="ritual-question-area">
-                                <div class="ritual-q-label">▸ 의식 심문 프로토콜</div>
-                                <div class="ritual-q-text" id="ritual-q-text"></div>
-                                <div id="ritual-options-container"></div>
-                            </div>
-
-                            <div style="flex:1;">
-                                <div class="section-header">의식 출력</div>
-                                <div class="lore-reveal-window" id="garden-lore-box" style="margin-top:12px;">
-                                    레지스트리에서 고인의 프로필을 선택하세요.<br>
-                                    꽃의 종류가 봉인 해제 등급을 결정합니다.<br><br>
-                                    <span style="color:var(--color-garden); font-size:10px;">GYPSOPHILA / LILY → 표면 기밀<br>BLACK ROSE / FORGET-ME-NOT → 심층 기밀<br>NARCISSUS / DRIED WISTERIA → 봉인 기밀</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="mod-clinic" class="module-panel">
-            <div class="grid-layout">
-                <div class="side-hud-bar">
-                    <div class="section-header">CLINIC 캘리브레이션</div>
-                    <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted); line-height:1.9; margin-top:8px;">
-                        팽창 링이 점선 <span style="color:var(--color-clinic);">TARGET ZONE</span>과 겹칠 때<br>
-                        <span style="color:var(--color-clinic);">[SYNC]</span>를 누르세요.<br>
-                        성공하면 코스트가 감소합니다.
-                    </div>
-
-                    <div>
-                        <div class="section-header">난이도 선택 <span class="count" id="diff-tier-label">Tier 1</span></div>
-                        <div class="diff-selector-group">
-                            <button class="diff-btn diff-active" id="diff-DORMANT" onclick="setDifficulty('DORMANT')">
-                                휴면 DORMANT
-                                <span class="diff-tier-badge">T1</span>
-                            </button>
-                            <button class="diff-btn" id="diff-STABLE" onclick="setDifficulty('STABLE')">
-                                안정 STABLE
-                                <span class="diff-tier-badge">T2</span>
-                            </button>
-                            <button class="diff-btn" id="diff-ACTIVE" onclick="setDifficulty('ACTIVE')">
-                                활성 ACTIVE
-                                <span class="diff-tier-badge">T3</span>
-                            </button>
-                            <button class="diff-btn d-critical" id="diff-CRITICAL" onclick="setDifficulty('CRITICAL')">
-                                임계 CRITICAL
-                                <span class="diff-tier-badge">T4</span>
-                            </button>
-                            <button class="diff-btn d-runaway" id="diff-RUNAWAY" onclick="setDifficulty('RUNAWAY')">
-                                폭주 RUNAWAY
-                                <span class="diff-tier-badge">T5</span>
-                            </button>
-                        </div>
-                        <div style="font-family:var(--font-mono); font-size:9px; color:var(--text-muted); margin-top:6px; letter-spacing:1px;">높은 난이도 = 더 귀중한 기밀</div>
-                    </div>
-
-                    <div>
-                        <div class="section-header">동기화 게이지 <span class="count" id="sync-gauge-count">0 / 15</span></div>
-                        <div style="height:6px; background:rgba(0,229,255,0.08); margin-top:8px; position:relative; overflow:hidden;">
-                            <div id="sync-progress-bar" style="height:100%; width:0%; background:var(--color-clinic); box-shadow:0 0 8px var(--color-clinic); transition:width 0.3s ease;"></div>
-                        </div>
-                        <div class="sync-wave-display" style="margin-top:8px;">WAVE <span id="sync-wave-num">1</span> // 속도 배율 <span id="sync-speed-mult">×1.0</span></div>
-                        <div class="sync-speed-bar-wrap">
-                            <div class="sync-speed-bar" id="sync-speed-bar" style="width:5%;"></div>
-                        </div>
-                    </div>
-
-                    <div style="margin-top:auto;">
-                        <div class="section-header">안정화 로그</div>
-                        <div class="clinic-sync-stats-box" id="clinic-sync-stats" style="margin-top:8px;">안정화율: 100%</div>
-                    </div>
-                </div>
-
-                <div class="main-workspace">
-                    <div class="clinic-sync-workspace">
-                        <div class="clinic-arena-label" id="clinic-arena-label">ANCHOR 동기화 프로토콜 // CLINIC UNDER</div>
-                        <div class="pulse-core-ring-wrapper">
-                            <div class="pulse-scanner"></div>
-                            <div class="pulse-target-zone" id="pulse-target-zone-el"></div>
-                            <div class="pulse-expanding-ring" id="clinic-pulse-ring"></div>
-                            <div class="pulse-hit-flash" id="pulse-hit-flash"></div>
-                            <div class="combo-flash-text" id="combo-flash-text">COMBO!</div>
-                        </div>
-                        <button class="clinic-sync-btn" id="clinic-sync-btn" onclick="checkClinicSyncTiming()">SYNC</button>
-                        <div class="sync-result-display" id="sync-result-display"></div>
-                        <div class="clinic-sync-stats-box" id="clinic-sync-stats-bottom" style="font-size:12px;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        </aside>
     </div>
 </div>
 
 <script>
-// ============================================================
-// BGM AUDIO SETUP (ADDED)
-// ============================================================
-const bgm = new Audio();
-bgm.loop = true;
-bgm.volume = 0.5;
-let isBgmEnabled = true;
+    const { Engine, Render, Runner, Bodies, Composite, Body, Events } = Matter;
 
-const audioFiles = {
-    'mod-suika': './MARK CONDENSATION.mp3',
-    'mod-sim': './INCIDENT RESPONSE.mp3',
-    'mod-test': './ORG APTITUDE.mp3',
-    'mod-garden': './GARDEN RITE.mp3',
-    'mod-clinic': './COST RELIEF SYNC.mp3'
-};
-
-function playBgmForTab(tabId) {
-    if (!isBgmEnabled) return;
-    if (audioFiles[tabId]) {
-        const newSrc = new URL(audioFiles[tabId], document.baseURI).href;
-        if (bgm.src !== newSrc) {
-            bgm.src = audioFiles[tabId];
-            bgm.play().catch(e => console.log("자동 재생 차단됨", e));
-        } else if (bgm.paused) {
-            bgm.play().catch(e => console.log("자동 재생 차단됨", e));
-        }
-    }
-}
-
-function toggleBgm() {
-    const btn = document.getElementById('bgm-toggle');
-    if (isBgmEnabled) {
-        bgm.pause();
-        isBgmEnabled = false;
-        btn.textContent = '🔈 OFF';
-    } else {
-        isBgmEnabled = true;
-        btn.textContent = '🔊 ON';
-        const activeTab = document.querySelector('.module-panel.active').id;
-        playBgmForTab(activeTab);
-    }
-}
-
-function changeVolume(val) {
-    bgm.volume = parseFloat(val);
-}
-
-// 브라우저 자동재생 정책 대응
-document.body.addEventListener('click', function initBgm() {
-    if (bgm.paused && isBgmEnabled) {
-        const activeTab = document.querySelector('.module-panel.active').id;
-        playBgmForTab(activeTab);
-    }
-    document.body.removeEventListener('click', initBgm);
-}, { once: true });
-
-
-// ============================================================
-// UTILITIES
-// ============================================================
-const wait = ms => new Promise(r => setTimeout(r, ms));
-
-async function typeText(el, text, cls = "") {
-    const span = document.createElement("span");
-    if (cls) span.className = cls;
-    el.appendChild(span);
-    for (let i = 0; i < text.length; i++) {
-        span.textContent += text[i];
-        el.scrollTop = el.scrollHeight;
-        await wait(text[i] === '\n' ? 20 : 6);
-    }
-}
-
-// ============================================================
-// CURSOR
-// ============================================================
-const customCursor = document.getElementById('custom-cursor');
-document.addEventListener('mousemove', e => {
-    customCursor.style.left = e.clientX + 'px';
-    customCursor.style.top  = e.clientY + 'px';
-});
-document.addEventListener('mousedown', () => customCursor.style.transform = 'translate(-50%,-50%) scale(0.75)');
-document.addEventListener('mouseup',   () => customCursor.style.transform = 'translate(-50%,-50%) scale(1)');
-
-// ============================================================
-// AMBIENT (RAIN + FOG)
-// ============================================================
-const ambCanvas = document.getElementById('ambient-canvas');
-const actx = ambCanvas.getContext('2d');
-let raindrops = [];
-
-function resizeAmb() {
-    ambCanvas.width  = window.innerWidth;
-    ambCanvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resizeAmb);
-resizeAmb();
-
-for (let i = 0; i < 90; i++) {
-    raindrops.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        len: Math.random() * 22 + 12,
-        speed: Math.random() * 9 + 10,
-        opacity: Math.random() * 0.18 + 0.04,
-        // slight blue tint
-        r: 100 + Math.floor(Math.random()*40),
-        g: 140 + Math.floor(Math.random()*40),
-        b: 220 + Math.floor(Math.random()*35)
-    });
-}
-
-function animateAmb() {
-    actx.clearRect(0, 0, ambCanvas.width, ambCanvas.height);
-    // fog
-    const fog = actx.createRadialGradient(
-        ambCanvas.width/2, ambCanvas.height/2, 80,
-        ambCanvas.width/2, ambCanvas.height/2, ambCanvas.width * 0.9
-    );
-    fog.addColorStop(0, 'rgba(4,10,28,0)');
-    fog.addColorStop(1, 'rgba(2,5,18,0.3)');
-    actx.fillStyle = fog; actx.fillRect(0,0,ambCanvas.width,ambCanvas.height);
-
-    // rain
-    raindrops.forEach(d => {
-        actx.globalAlpha = d.opacity;
-        actx.strokeStyle = `rgba(${d.r},${d.g},${d.b},1)`;
-        actx.lineWidth = 0.8;
-        actx.beginPath();
-        actx.moveTo(d.x, d.y);
-        actx.lineTo(d.x - 1.5, d.y + d.len);
-        actx.stroke();
-        d.y += d.speed; d.x -= 0.8;
-        if (d.y > ambCanvas.height) { d.y = -d.len; d.x = Math.random() * ambCanvas.width; }
-    });
-    actx.globalAlpha = 1;
-    requestAnimationFrame(animateAmb);
-}
-animateAmb();
-
-// ============================================================
-// LOADING BOOT SEQUENCE
-// ============================================================
-const loadLogs = [
-    "SYS_INIT: COVE 내부 인프라 연결 중...",
-    "MARK_SCANNER: 국제 프로토콜로 스캔 초기화 중...",
-    "감지 완료: 핵심 지표 내 감염자 2,491명 식별됨",
-    "누적 부담: 구역 전체 코스트 수준 74.2%",
-    "OFFICE 레지스터: 행정 통제 매트릭스 통합 중...",
-    "CENTER 포스: 저층 슬럼가에 진압 오퍼레이터 투입 중...",
-    "CLINIC 연구소: 반폭주 앰풀 안정화 완료. 연구 계속.",
-    "GARDEN 데이터: 추모 로그 네트워크 연결 // 오늘의 프로필 로드 완료.",
-    "터미널 잠금 해제: 데이터 동기화 완료 — SYSTEM_READY."
-];
-
-let logIdx = 0;
-const logBox  = document.getElementById('load-logs');
-const fillBar = document.getElementById('load-fill');
-
-function printLog() {
-    if (logIdx < loadLogs.length) {
-        const d = document.createElement('div');
-        d.textContent = ">> " + loadLogs[logIdx];
-        logBox.appendChild(d);
-        const prev = logBox.children[logBox.children.length - 2];
-        if (prev) prev.classList.remove('active-log');
-        d.classList.add('active-log');
-        logBox.scrollTop = logBox.scrollHeight;
-        logIdx++;
-        fillBar.style.width = (logIdx / loadLogs.length * 100) + '%';
-        setTimeout(printLog, 220 + Math.random() * 140);
-    } else {
-        setTimeout(() => {
-            document.getElementById('loading-screen').style.opacity = '0';
-            document.getElementById('app-wrapper').style.opacity = '1';
-            setTimeout(() => document.getElementById('loading-screen').style.display = 'none', 1000);
-        }, 500);
-    }
-}
-setTimeout(printLog, 400);
-
-// ============================================================
-// TAB SWITCHING
-// ============================================================
-function triggerTab(e, id) {
-    document.querySelectorAll('.module-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-trigger').forEach(t => t.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    e.currentTarget.classList.add('active');
-    if (id === 'mod-suika' && !suikaRunning) bootSuikaGame();
-    
-    // (ADDED) 탭을 누를 때마다 배경음악 실행
-    playBgmForTab(id);
-}
-
-// ============================================================
-// MODULE 1: MARK CONDENSATION (SUIKA)
-// ============================================================
-const SUIKA_UNITS = [
-    { id:1,  name:"SIGN",    r:16,  pts:1,  color:"#3a4a6b" },
-    { id:2,  name:"HAZE",    r:23,  pts:3,  color:"#4a6090" },
-    { id:3,  name:"SATIN",   r:31,  pts:6,  color:"#5a78b8" },
-    { id:4,  name:"DODGE",   r:40,  pts:10, color:"#38bdf8" },
-    { id:5,  name:"CUFF",    r:50,  pts:15, color:"#0ea5e9" },
-    { id:6,  name:"VECTOR",  r:61,  pts:21, color:"#2563eb" },
-    { id:7,  name:"DRAMA",   r:73,  pts:28, color:"#f0b429" },
-    { id:8,  name:"REPLICA", r:86,  pts:36, color:"#ea580c" },
-    { id:9,  name:"MOIRAI",  r:100, pts:45, color:"#ec4899" },
-    { id:10, name:"SOMA",    r:115, pts:55, color:"#e11d48" },
-    { id:11, name:"GASOLINE",r:130, pts:66, color:"#00e676" },
-];
-
-let sEngine, sWorld, sRunner, sCanvas, sCtx;
-let sFruits = [], sScore = 0;
-let sCurLevel = 1, sNextLevel = 1;
-let sCanDrop = true, sGameOver = false;
-let suikaRunning = false, sGhostX = 220, sAnimId = null;
-let sUnlockedLevels = new Set([1, 2, 3]); // 초기 해금 등급
-
-function buildMarkDB() {
-    const list = document.getElementById('mark-db-list');
-    list.innerHTML = '';
-    SUIKA_UNITS.forEach(u => {
-        const unlocked = sUnlockedLevels.has(u.id);
-        const d = document.createElement('div');
-        d.className = 'db-row-item';
-        d.innerHTML = `
-            <div class="db-circle-color" style="background:${unlocked ? u.color : '#1a2030'}; border-color:${unlocked ? u.color : '#2a3a50'};"></div>
-            <div class="db-name" style="${unlocked ? '' : 'color:var(--text-muted);'}">${unlocked ? u.name : '???'}</div>
-            <div class="db-pts">${unlocked ? '+'+u.pts+'P' : '--'}</div>
-        `;
-        list.appendChild(d);
-    });
-}
-
-function bootSuikaGame() {
-    suikaRunning = true;
-    buildMarkDB();
-    document.getElementById('suika-go-panel').style.display = 'none';
-    sCanvas = document.getElementById('suika-canvas');
-    sCtx = sCanvas.getContext('2d');
-    sScore = 0; sGameOver = false; sFruits = []; sCanDrop = true;
-    sUnlockedLevels = new Set([1, 2, 3]);
-    document.getElementById('suika-current-score').textContent = 0;
-
-    if (sAnimId) cancelAnimationFrame(sAnimId);
-    if (sEngine) { Matter.Runner.stop(sRunner); Matter.World.clear(sWorld); Matter.Engine.clear(sEngine); }
-
-    sEngine = Matter.Engine.create({ gravity: { x:0, y:1.4 } });
-    sWorld  = sEngine.world;
-
-    const wOpts = { isStatic:true, friction:0.2, render:{visible:false} };
-    Matter.World.add(sWorld, [
-        Matter.Bodies.rectangle(220, 650, 440, 20, wOpts),
-        Matter.Bodies.rectangle(-10, 320, 20, 640, wOpts),
-        Matter.Bodies.rectangle(450, 320, 20, 640, wOpts)
-    ]);
-
-    Matter.Events.on(sEngine, 'collisionStart', evt => {
-        if (sGameOver) return;
-        evt.pairs.forEach(pair => {
-            const a = pair.bodyA, b = pair.bodyB;
-            if (a.label==='mark' && b.label==='mark' && a.gameLvl===b.gameLvl && a.gameLvl<11 && !a.isMerged && !b.isMerged) {
-                a.isMerged = b.isMerged = true;
-                doMerge(a, b);
-            }
-        });
-    });
-
-    sRunner = Matter.Runner.create();
-    Matter.Runner.run(sRunner, sEngine);
-
-    sCurLevel  = Math.ceil(Math.random() * 3);
-    sNextLevel = Math.ceil(Math.random() * 3);
-    drawNextPreview();
-
-    // Responsive Canvas Coordinate Mapping
-    function getCanvasX(clientX) {
-        const r = sCanvas.getBoundingClientRect();
-        const scaleX = sCanvas.width / r.width;
-        return (clientX - r.left) * scaleX;
-    }
-
-    // Mouse Events
-    sCanvas.onmousemove = e => { sGhostX = getCanvasX(e.clientX); };
-    
-    // Touch Events for Mobile
-    sCanvas.addEventListener('touchmove', e => {
-        if (e.touches.length > 0) {
-            e.preventDefault(); // Prevents page scrolling while dragging
-            sGhostX = getCanvasX(e.touches[0].clientX);
-        }
-    }, { passive: false });
-
-    function dropFruit(clientX) {
-        if (!sCanDrop || sGameOver) return;
-        sCanDrop = false;
-        let cx = getCanvasX(clientX);
-        const rad = SUIKA_UNITS[sCurLevel-1].r;
-        cx = Math.max(rad+4, Math.min(440-rad-4, cx));
-
-        const mark = Matter.Bodies.circle(cx, 45, rad, { label:'mark', restitution:0.15, friction:0.4 });
-        mark.gameLvl = sCurLevel; mark.isMerged = false; mark.settledTime = Date.now();
-        Matter.World.add(sWorld, mark); sFruits.push(mark);
-
-        sCurLevel  = sNextLevel;
-        sNextLevel = Math.ceil(Math.random() * 4);
-        drawNextPreview();
-        setTimeout(() => { sCanDrop = true; }, 500);
-    }
-
-    sCanvas.onclick = e => { dropFruit(e.clientX); };
-    sCanvas.addEventListener('touchend', e => {
-        if (e.changedTouches.length > 0) {
-            dropFruit(e.changedTouches[0].clientX);
-        }
-    });
-
-    sAnimId = requestAnimationFrame(renderSuika);
-}
-
-function doMerge(a, b) {
-    const mx = (a.position.x + b.position.x)/2;
-    const my = (a.position.y + b.position.y)/2;
-    const lvl = a.gameLvl + 1;
-    Matter.World.remove(sWorld, [a, b]);
-    sFruits = sFruits.filter(f => f!==a && f!==b);
-    sScore += SUIKA_UNITS[lvl-1].pts;
-    document.getElementById('suika-current-score').textContent = sScore;
-    const m = Matter.Bodies.circle(mx, my, SUIKA_UNITS[lvl-1].r, { label:'mark', restitution:0.18, friction:0.4 });
-    m.gameLvl = lvl; m.isMerged = false; m.settledTime = Date.now();
-    sUnlockedLevels.add(lvl); // 합성으로 해금
-    Matter.World.add(sWorld, m); sFruits.push(m);
-    buildMarkDB(); // DB 목록 갱신
-}
-
-function drawNextPreview() {
-    const nc = document.getElementById('suika-next-canvas');
-    const nx = nc.getContext('2d');
-    nx.clearRect(0,0,60,60);
-    const u = SUIKA_UNITS[sNextLevel-1];
-    // glow
-    nx.shadowBlur = 14; nx.shadowColor = u.color;
-    nx.fillStyle = u.color;
-    nx.beginPath(); nx.arc(30,30,18,0,Math.PI*2); nx.fill();
-    nx.shadowBlur = 0;
-    nx.strokeStyle = 'rgba(255,255,255,0.5)'; nx.lineWidth = 1;
-    nx.beginPath(); nx.arc(30,30,18,0,Math.PI*2); nx.stroke();
-    nx.fillStyle = '#fff'; nx.font = 'bold 10px Share Tech Mono';
-    nx.textAlign = 'center'; nx.textBaseline = 'middle';
-    nx.fillText(u.name.substring(0,3), 30, 30);
-}
-
-function renderSuika() {
-    if (sGameOver) return;
-    sCtx.clearRect(0,0,440,640);
-
-    // danger line
-    sCtx.strokeStyle = 'rgba(255,82,82,0.35)';
-    sCtx.lineWidth = 1; sCtx.setLineDash([5,5]);
-    sCtx.beginPath(); sCtx.moveTo(0,95); sCtx.lineTo(440,95); sCtx.stroke();
-    sCtx.setLineDash([]);
-
-    // drop guide
-    if (sCanDrop && !sGameOver) {
-        const rad = SUIKA_UNITS[sCurLevel-1].r;
-        const tx = Math.max(rad+4, Math.min(440-rad-4, sGhostX));
-        sCtx.strokeStyle = 'rgba(0,229,255,0.08)';
-        sCtx.setLineDash([3,5]);
-        sCtx.beginPath(); sCtx.moveTo(tx,45); sCtx.lineTo(tx,640); sCtx.stroke();
-        sCtx.setLineDash([]);
-        const u = SUIKA_UNITS[sCurLevel-1];
-        sCtx.shadowBlur = 10; sCtx.shadowColor = u.color;
-        sCtx.fillStyle = u.color; sCtx.globalAlpha = 0.4;
-        sCtx.beginPath(); sCtx.arc(tx,45,rad,0,Math.PI*2); sCtx.fill();
-        sCtx.globalAlpha = 1; sCtx.shadowBlur = 0;
-    }
-
-    let rampage = false;
-    const now = Date.now();
-    sFruits.forEach(f => {
-        const u = SUIKA_UNITS[f.gameLvl-1];
-        sCtx.save();
-        sCtx.translate(f.position.x, f.position.y);
-        sCtx.rotate(f.angle);
-        // glow
-        sCtx.shadowBlur = 12; sCtx.shadowColor = u.color;
-        sCtx.fillStyle = u.color;
-        sCtx.beginPath(); sCtx.arc(0,0,u.r,0,Math.PI*2); sCtx.fill();
-        sCtx.shadowBlur = 0;
-        // outer ring - bright and thick
-        sCtx.strokeStyle = 'rgba(255,255,255,0.92)'; sCtx.lineWidth = 2.2;
-        sCtx.beginPath(); sCtx.arc(0,0,u.r,0,Math.PI*2); sCtx.stroke();
-        // inner ring
-        sCtx.strokeStyle = 'rgba(255,255,255,0.3)'; sCtx.lineWidth = 1;
-        sCtx.beginPath(); sCtx.arc(0,0,u.r*0.65,0,Math.PI*2); sCtx.stroke();
-        // label
-        sCtx.fillStyle = '#fff';
-        sCtx.font = `700 ${Math.max(9, u.r*0.45)}px Share Tech Mono`;
-        sCtx.textAlign = 'center'; sCtx.textBaseline = 'middle';
-        if (sUnlockedLevels.has(f.gameLvl)) {
-            const nameShort = u.name.length > 6 ? u.name.substring(0,6) : u.name;
-            sCtx.fillText(nameShort, 0, 0);
-        } else {
-            sCtx.fillStyle = 'rgba(255,255,255,0.35)';
-            sCtx.font = `700 ${Math.max(8, u.r*0.38)}px Share Tech Mono`;
-            sCtx.fillText('???', 0, 0);
-        }
-        sCtx.restore();
-
-        if (f.position.y - u.r < 95 && now - f.settledTime > 1500 && Math.abs(f.velocity.y) < 0.15) rampage = true;
-    });
-
-    if (rampage) {
-        sGameOver = true;
-        document.getElementById('suika-go-panel').style.display = 'flex';
-    } else {
-        sAnimId = requestAnimationFrame(renderSuika);
-    }
-}
-
-window.addEventListener('load', () => {
-    updateCostBar();
-    if (document.getElementById('mod-suika').classList.contains('active')) bootSuikaGame();
-});
-
-// ============================================================
-// MODULE 2: INCIDENT RESPONSE SIMULATOR
-// ============================================================
-let globalCost = 40;
-
-const SCENARIOS = [
-    {
-        title: "[구역: 저층] 2세대 집단 폭주 — 조선소 고철지대",
-        situation: "저층 고철 야적장에서 2세대 미성년 감염자 셋이 연쇄 공명 폭주를 일으켰다. 생성된 관통형 돔 장벽이 저층과 하이브 구역의 경계를 침식하며 분당 12미터씩 팽창 중이다.",
-        query: "초기 전술 접근 방식을 선택하라.",
-        branches: [
-            {
-                text: "[CENTER 전용] 기갑 운동폭발파 투입 — 장벽 경계를 돌파하고, 세 명의 표적을 즉각 강제 진압한다.",
-                reqOrg: "CENTER",
-                outcome: "대규모 충격파가 장벽 벽면을 갈라낸다. 아이들은 마크 부위에서 피를 흘리며 신경 역류로 쓰러진다 — 그러나 폭주파는 완전히 차단됐다.",
-                costDelta: 15
-            },
-            {
-                text: "[ANCHOR 전용] 방어구를 벗어던지고, 자신의 마크 주파수를 장벽의 공명에 동조시켜 맨손으로 침투한다.",
-                reqRole: "ANCHOR",
-                outcome: "자신의 흔적을 역장과 공명시켜 침묵 속에 투과한다. 한 아이의 얼굴을 감싸쥐며 정신 파형을 동기화하자 — 재해가 고요함 속으로 가라앉는다.",
-                costDelta: -20
-            },
-            {
-                text: "[OFFICE 전용] 1km 경계를 봉쇄하고, OFFICE 본부에 행정 타격대를 요청한다.",
-                reqOrg: "OFFICE",
-                outcome: "프로토콜 준수 격리 확립. CENTER 본대가 도착해 아이들을 수습하기 전까지 하이브 구역이 일부 구조적 피해를 입는다. 에이전트 코스트는 완전 통제.",
-                costDelta: 5
-            },
-            {
-                text: "[공용] 원격 진압 장치를 투입해 장벽의 에너지 밀도를 강제 분산시킨다.",
-                reqOrg: "ANY",
-                outcome: "장벽은 분산됐지만, 역류 전류가 당신의 신경계를 직격한다. 이명과 편두통이 연쇄적으로 밀려온다 — 코스트 누적 확인.",
-                costDelta: 25
-            }
-        ]
-    },
-    {
-        title: "[구역: 항구] 마크 누출 — 미등록 밀항자",
-        situation: "5년의 격리 기간을 채우지 못한 미등록 감염자가 국제 항구 외국 화물선에 숨겨진 컨테이너에서 탈출했다. 격리 차별로 인한 심리 붕괴로 신체의 모든 수분이 압력으로 전환돼, 현재 항만 크레인을 파괴 중이다. 공기 중 습도가 임계 압축 밀도에 근접하고 있다.",
-        query: "에이전트의 결정을 입력하라.",
-        branches: [
-            {
-                text: "[진압 전용] 직접 중력 압쇄파 투입 — 밀항자의 척추를 지면에 고정시킨다.",
-                reqRole: "SUPPRESS",
-                outcome: "무자비한 힘이 명중한다. 사지가 무너진다. 수분 압력 능력이 정지된다 — 항만 통제권 회복. 영구 마비는 불가피한 결과다.",
-                costDelta: 10
-            },
-            {
-                text: "[CLINIC 전용] 정밀 진정 가스 탄두를 투입해 신경 유도 수면 상태를 유발한다.",
-                reqOrg: "CLINIC",
-                outcome: "청색 안개가 표적의 폐를 채운다. 수분 압축이 과정 중간에 차분히 동결된다 — 대상자는 의식을 잃은 채 포획되어 언더 연구시설로 이송된다.",
-                costDelta: 5
-            },
-            {
-                text: "[GARDEN 전용] 고인이 좋아하던 꽃의 향기를 맞춰 방출해 — 은밀한 탈출 경로를 연다.",
-                reqOrg: "GARDEN",
-                outcome: "GARDEN의 침묵 중립 프로토콜. 밤안개의 엄호 속에 밀항자는 출항 선박에 올라 자취를 감춘다. OFFICE 보고서 처리: '소멸 — 소재 불명.'",
-                costDelta: -10
-            }
-        ]
-    }
-];
-
-function updateCostBar() {
-    const fill = document.getElementById('sim-cost-fill-bar');
-    const text = document.getElementById('sim-cost-display-text');
-    const gfill = document.getElementById('global-cost-fill');
-    fill.style.width = globalCost + '%';
-    gfill.style.width = globalCost + '%';
-    text.textContent = globalCost + '%';
-    if (globalCost >= 85) {
-        fill.style.background = 'var(--color-center)'; fill.style.boxShadow = '0 0 10px var(--color-center)';
-        gfill.style.background = 'var(--color-center)'; gfill.style.boxShadow = '0 0 8px var(--color-center)';
-    } else if (globalCost >= 60) {
-        fill.style.background = 'var(--color-office)'; fill.style.boxShadow = '0 0 10px var(--color-office)';
-        gfill.style.background = 'var(--color-office)'; gfill.style.boxShadow = '0 0 8px var(--color-office)';
-    } else {
-        fill.style.background = 'var(--color-clinic)'; fill.style.boxShadow = '0 0 10px var(--color-clinic)';
-        gfill.style.background = 'var(--color-clinic)'; gfill.style.boxShadow = '0 0 8px var(--color-clinic)';
-    }
-}
-
-let activeScenario = null;
-
-async function initiateScenarioDispatch() {
-    const out   = document.getElementById('sim-terminal-output');
-    const choices = document.getElementById('sim-choice-container');
-    out.innerHTML = ''; choices.innerHTML = '';
-
-    activeScenario = SCENARIOS[Math.floor(Math.random() * SCENARIOS.length)];
-
-    await typeText(out, `[SYSTEM LOG] ═══════════════════════════════════\n`, "sys-msg");
-    await typeText(out, `[긴급] COVE 내 비상 사건 등록됨\n`, "alert-msg");
-    await typeText(out, `[SYSTEM LOG] ═══════════════════════════════════\n\n`, "sys-msg");
-    await typeText(out, `INCIDENT ID : ${activeScenario.title}\n\n`, "heal-msg");
-    await typeText(out, `현장 보고 :\n${activeScenario.situation}\n\n`);
-    await typeText(out, `[선택 요청] : ${activeScenario.query}\n`, "sys-msg");
-
-    buildChoices();
-}
-
-function buildChoices() {
-    const cc = document.getElementById('sim-choice-container');
-    cc.innerHTML = '';
-    const org  = document.getElementById('sim-input-org').value;
-    const role = document.getElementById('sim-input-role').value;
-
-    activeScenario.branches.forEach(b => {
-        const btn = document.createElement('button');
-        btn.className = 'interactive-choice-btn';
-        let locked = false;
-        if (b.reqOrg && b.reqOrg !== 'ANY' && b.reqOrg !== org) locked = true;
-        if (b.reqRole && b.reqRole !== role) {
-            if (b.reqOrg && b.reqOrg === org) locked = false;
-            else if (b.reqOrg && b.reqOrg !== 'ANY') locked = true;
-            else locked = true;
-        }
-        if (locked) {
-            btn.classList.add('disabled-node');
-            btn.textContent = `🔒 [접근 불가] ${b.text.split(']')[1] || b.text}`;
-        } else {
-            btn.textContent = b.text;
-            btn.onclick = () => resolveChoice(b);
-        }
-        cc.appendChild(btn);
-    });
-}
-
-async function resolveChoice(b) {
-    const out = document.getElementById('sim-terminal-output');
-    document.getElementById('sim-choice-container').innerHTML = '';
-    await typeText(out, `\n>> 전술 선택 확정.\n`, "sys-msg");
-    await wait(500);
-    await typeText(out, `[결과] :\n${b.outcome}\n\n`, "heal-msg");
-    globalCost = Math.min(100, Math.max(0, globalCost + b.costDelta));
-    updateCostBar();
-
-    const cc = document.getElementById('sim-choice-container');
-    if (globalCost >= 100) {
-        await typeText(out, `[치명] 에이전트 코스트 임계치 초과 (100%).\n자기 보존 기능 정지 임박.\n피부 표면의 마크 흔적 발화 중 — 강제 격리 유닛 출동.\n`, "alert-msg");
-        const btn = document.createElement('button');
-        btn.className = 'hud-action-btn'; btn.style.maxWidth = '320px';
-        btn.textContent = 'CLINIC 긴급 회복 프로토콜';
-        btn.onclick = () => { globalCost = 30; updateCostBar(); initiateScenarioDispatch(); };
-        cc.appendChild(btn);
-    } else {
-        const btn = document.createElement('button');
-        btn.className = 'hud-action-btn'; btn.style.maxWidth = '220px';
-        btn.textContent = '▶ 다음 대기 상태';
-        btn.onclick = initiateScenarioDispatch;
-        cc.appendChild(btn);
-    }
-}
-
-// ============================================================
-// MODULE 3: ORGANIZATION APTITUDE
-// ============================================================
-const QUESTIONS = [
-    {
-        q: "저층 슬럼가의 깊은 배수로에서, 극도의 고착 거부 반응으로 폭주 직전에 몰린 2세대 유아 감염자를 발견했다. 당신의 대응 원칙은?",
-        options: [
-            { t:"법적 권한에 따라 무력화 — 물리적 충격을 가하고 강제 포획해 구역 규모의 피해를 막는다.", target:"CENTER" },
-            { t:"지휘부에 행정 보고서를 제출하고, 표준 명령 규정에 따라 최대 준수 주민 대피 프로토콜을 실행한다.", target:"OFFICE" },
-            { t:"자신의 각인 부작용과 트라우마를 무시하고 — 아이를 품에 안아 직접 피부 접촉 고착을 시도한다.", target:"CLINIC" },
-            { t:"CENTER와 OFFICE 감시망을 교란하고 — 아이를 은밀히 중립 정보원 안가로 빼돌린다.", target:"GARDEN" }
-        ]
-    },
-    {
-        q: "능력을 주기적으로 방출하지 않으면 신경계가 스스로 타버린다. 코스트의 형태를 선택할 수 있다면 — 어떤 대가를 감수하겠는가?",
-        options: [
-            { t:"전신 골절 감각과 외상성 출혈 — 극도의 육체적 고통, 아무것도 억제하지 않는다.", target:"CENTER" },
-            { t:"모든 감정과 공감의 영구 소거 — 인간 내면을 완전히 마취시키는 냉철한 무감각.", target:"OFFICE" },
-            { t:"체온이 빙점 이하로 떨어지고 — 타인과의 신체 접촉이 영원히 금지된다.", target:"CLINIC" },
-            { t:"사랑하는 이들과 자신의 기억이 모래처럼 흩어진다 — 바닥 없이 깊어지는 망각.", target:"GARDEN" }
-        ]
-    },
-    {
-        q: "비에 잠기고 안개에 잠식된 해안 격리 도시, COVE — 당신은 이곳을 어떻게 정의하는가?",
-        options: [
-            { t:"매일 자신의 파괴력을 증명해야만 생존할 수 있는, 피로 물든 전쟁터.", target:"CENTER" },
-            { t:"오직 효율만으로 질서의 불안한 균형을 유지해야 하는 광대한 통제 영토.", target:"OFFICE" },
-            { t:"살아 있는 실험실 — 마크 바이러스의 모든 흔적이 영구 완화로 가는 길의 데이터 포인트.", target:"CLINIC" },
-            { t:"떠날 수 없는 자들이 서로의 죽음을 꽃으로 지워가는, 비참한 고향.", target:"GARDEN" }
-        ]
-    }
-];
-
-let qIdx = 0, aptScores = { CENTER:0, OFFICE:0, CLINIC:0, GARDEN:0 };
-
-function startAptitudeTest() {
-    document.getElementById('test-intro-box').style.display = 'none';
-    qIdx = 0; aptScores = { CENTER:0, OFFICE:0, CLINIC:0, GARDEN:0 };
-    renderQuestion();
-}
-
-function renderQuestion() {
-    const area = document.getElementById('test-qa-area');
-    area.innerHTML = '';
-    if (qIdx >= QUESTIONS.length) { showResult(); return; }
-
-    const q = QUESTIONS[qIdx];
-    const card = document.createElement('div');
-    card.className = 'aptitude-card active';
-    card.innerHTML = `
-        <div style="font-family:var(--font-mono); font-size:10px; color:var(--text-muted); margin-bottom:14px; letter-spacing:2px;">EVALUATION NODE 0${qIdx+1} / 0${QUESTIONS.length}</div>
-        <div class="aptitude-question">${q.q}</div>
-    `;
-    q.options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'aptitude-option';
-        btn.textContent = opt.t;
-        btn.onclick = () => { aptScores[opt.target] += 3; qIdx++; renderQuestion(); };
-        card.appendChild(btn);
-    });
-    area.appendChild(card);
-}
-
-function showResult() {
-    document.getElementById('test-qa-area').innerHTML = '';
-    let best = "OFFICE", max = -1;
-    for (let k in aptScores) { if (aptScores[k] > max) { max = aptScores[k]; best = k; } }
-
-    const RESULTS = {
-        CENTER: {
-            rank:"CAPTAIN — 진압 타격대",
-            desc:"압도적인 물리적 제어 능력, 섬세한 감정적 공감보다 단호한 결단을 우선시합니다. 신체적 대가를 직업적 흉터로 받아들이며 — COVE의 실제 경계선 최전방에 서서 폭주가 대규모 사건이 되기 전 강제 종결합니다. CENTER의 집행자.",
-            color:"var(--color-center)"
-        },
-        OFFICE: {
-            rank:"COUNSELOR — 행정 통제국",
-            desc:"엄격한 체계적 규제, 구조 보전, 감정 없는 논리적 아키텍처에 최적화되어 있습니다. 마크 감염자의 위험 등급을 무자비하게 분류하고, 퇴소 승인을 명령하며, 이 불안한 행정적 평화의 톱니바퀴를 돌립니다. OFFICE의 관리급 오퍼레이터.",
-            color:"var(--color-office)"
-        },
-        CLINIC: {
-            rank:"CHIEF DOCTOR — 기밀 의학연구소",
-            desc:"마크와 그 대가 사이의 인과관계를 추적하는 냉철한 지적 탐구를 향해 본질이 뻗어 있습니다. 윤리적 경계를 넘는 것을 감수하며 — 고농도 완화 화합물을 개발하고, 폭주 환자를 수습하며, 언더 구역 최고의 연구 자산이 됩니다.",
-            color:"var(--color-clinic)"
-        },
-        GARDEN: {
-            rank:"LORE KEEPER — 정보 수신 기관",
-            desc:"권력 투쟁의 표면적 질서가 아닌, 어둠 속에서 거래되는 정보의 진실 — 그리고 주변에서 소멸해가는 자들의 잔여 기억에 귀 기울입니다. 어느 쪽도 선택하지 않고 양측을 관찰하며, 추모 의식을 집행하는 동시에 COVE의 가장 깊이 묻힌 비밀을 거래합니다.",
-            color:"var(--color-garden)"
-        }
+    // --- SYSTEM CONFIGURATIONS ---
+    const cfg = {
+        canvasWidth: 440,
+        canvasHeight: 650,
+        dropY: 80,
+        bpm: 128,
+        costPenalty: 12,
+        costDecay: 0.15
     };
 
-    const r = RESULTS[best];
-    const dossier = document.getElementById('test-result-dossier');
-    document.getElementById('dossier-org-title').textContent  = best;
-    document.getElementById('dossier-org-title').style.color  = r.color;
-    document.getElementById('dossier-rank-title').textContent = `배정 직책 : ${r.rank}`;
-    document.getElementById('dossier-body-text').textContent  = r.desc;
-    const stamp = document.getElementById('dossier-stamp-color');
-    stamp.textContent  = best + " 승인";
-    stamp.style.borderColor = r.color;
-    stamp.style.color        = r.color;
-    dossier.style.display    = 'block';
-    dossier.style.borderColor = r.color;
-    dossier.style.boxShadow   = `0 0 40px ${r.color}22`;
-}
+    // --- IMAGE & FRUIT SETTINGS ---
+    // 보유하고 계신 이미지(A1.PNG ~ A11.PNG)의 가로/세로 원본 해상도 크기를 적어주세요. (기본값 300px)
+    // 원본 크기를 적어두시면 게임 속 반지름에 맞춰 정확한 크기로 자동 변환 및 압축 스케일링됩니다.
+    const IMAGE_BASE_SIZE = 300; 
 
-function resetAptitudeTest() {
-    document.getElementById('test-result-dossier').style.display = 'none';
-    document.getElementById('test-intro-box').style.display = 'block';
-}
+    const FRUIT_CLASSES = [
+        { radius: 15, color: '#ff4154', name: 'CORE_ALPHA', score: 2, image: 'A1.PNG' },
+        { radius: 23, color: '#ff7626', name: 'CORE_BETA', score: 4, image: 'A2.PNG' },
+        { radius: 31, color: '#ffbd21', name: 'CORE_GAMMA', score: 8, image: 'A3.PNG' },
+        { radius: 40, color: '#00e575', name: 'CORE_DELTA', score: 16, image: 'A4.PNG' },
+        { radius: 50, color: '#00b0ff', name: 'CORE_EPSILON', score: 32, image: 'A5.PNG' },
+        { radius: 62, color: '#7c4dff', name: 'CORE_ZETA', score: 64, image: 'A6.PNG' },
+        { radius: 75, color: '#e040fb', name: 'CORE_ETA', score: 128, image: 'A7.PNG' },
+        { radius: 90, color: '#ff2c7d', name: 'CORE_THETA', score: 256, image: 'A8.PNG' },
+        { radius: 108, color: '#00e676', name: 'CORE_IOTA', score: 512, image: 'A9.PNG' },
+        { radius: 128, color: '#ffeb3b', name: 'CORE_KAPPA', score: 1024, image: 'A10.PNG' },
+        { radius: 150, color: '#00e5ff', name: 'SINGULARITY', score: 2048, image: 'A11.PNG' }
+    ];
 
-// ============================================================
-// MODULE 4: GARDEN RITE — EXPANDED
-// ============================================================
-const DECEASED_DB = [
-    {
-        name: "HAN YIGYEOL — 20세, 하이브 구역",
-        meta: "2세대 선천성 마크 보유자\n사인: VERDE 타입 폭주로 인한 신경세포 괴사",
-        ritual_q: "그가 소멸 직전 당신에게 남긴 마지막 문장을 어떻게 처리하겠습니까?",
-        ritual_opts: [
-            { label: "기억 속에 봉인한다", modifier: "A" },
-            { label: "GARDEN 데이터베이스에 등록한다", modifier: "B" },
-            { label: "그의 이름과 함께 불태운다", modifier: "C" }
-        ],
-        lore: {
-            surface: "HAN YIGYEOL: 소멸 직전, 그는 외해로 연결되는 부항구 지하 터널 설계도를 GARDEN에 전달했다. OFFICE는 깨끗한 폭주사로 공식 처리했다.",
-            hidden:  "HAN YIGYEOL: CENTER의 내부 집행 명령서가 확인됐다 — 그는 폭주로 죽은 것이 아니다. 지하 터널 설계도의 출처를 추적한 OFFICE가 '침묵 집행'을 승인했고, CENTER 캡틴 하나가 직접 처리했다.",
-            deep:    "HAN YIGYEOL: 설계도는 미끼였다. 그가 진짜로 GARDEN에 넘긴 것은 마크 바이러스의 최초 발생지 좌표가 담긴 암호화 필름이다. 현재 GARDEN 키퍼의 금고 가장 깊은 칸에 있다. OFFICE는 그 존재를 모른다.",
-            suffix: { A: " — 기억은 당신 안에서 타오른다.", B: " — 데이터베이스 기록 완료. 파일 ID: HY-20-VERDE.", C: " — 연기 속에서 진실이 사라진다." }
-        }
-    },
-    {
-        name: "SERIN — 24세, 저층 구역",
-        meta: "미등록 밀항 감염자\n사인: 내부 체액 역압축 부작용",
-        ritual_q: "그녀가 숨겨둔 컨테이너 일지를 발견했을 때, 당신의 선택은?",
-        ritual_opts: [
-            { label: "그대로 두고 봉인한다", modifier: "A" },
-            { label: "CLINIC에 익명으로 전달한다", modifier: "B" },
-            { label: "일지를 직접 읽는다", modifier: "C" }
-        ],
-        lore: {
-            surface: "SERIN: 그녀는 밀항 전 5년 격리 판정에 이의를 신청한 기록이 있다. OFFICE는 기각했다. 사인은 능력 부작용 — 체액이 내부에서 역방향으로 압축됐다.",
-            hidden:  "SERIN: 컨테이너 일지에 따르면 CLINIC 수석 의사의 '완화 화합물 No.4'가 감염률과 능력 강도를 인위적으로 증폭시킨다. 코스트 억제 효과는 마크 가속화의 위장이다 — 연구 데이터를 위해 피험자가 폭주하도록 유도한 것이다.",
-            deep:    "SERIN: 그녀는 화합물 No.4의 가장 초기 피험자였다. CLINIC은 그녀가 COVE에 도착하기 전, 외부 감염 경로를 조작해 그녀를 표적으로 지정했다. 마크는 자연 감염이 아니었다. OFFICE 디렉터가 실험 승인 서명을 했다.",
-            suffix: { A: " 일지는 재로 돌아간다.", B: " 익명 파일이 언더 구역 우편함에 도착한다.", C: " 진실을 읽는 것은 당신을 공범으로 만든다." }
-        }
-    },
-    {
-        name: "KAIDEN — 31세, CENTER 출신",
-        meta: "전직 오퍼레이터\n사인: 진압 중 누적 코스트 과부하로 인한 자아 용해",
-        ritual_q: "KAIDEN의 마지막 메모가 당신의 손에 들어왔습니다. 어떻게 하겠습니까?",
-        ritual_opts: [
-            { label: "CENTER 상부에 제출한다", modifier: "A" },
-            { label: "GARDEN 정보망에 유통시킨다", modifier: "B" },
-            { label: "소각한다", modifier: "C" }
-        ],
-        lore: {
-            surface: "KAIDEN: 그는 활성 진압 임무 23회 연속 수행 후 자아 용해 판정을 받았다. CENTER 공식 기록은 '명예로운 코스트 소진'으로 분류된다.",
-            hidden:  "KAIDEN의 마지막 메모 — 'CENTER 캡틴들은 우리의 코스트가 소모품이라고 말한다. 거짓말이다. OFFICE는 과부하 오퍼레이터의 신체를 언더 구역 생체 배양 기질로 거래한다. 나는 다음 차례다.' 이 메모는 현재 GARDEN이 보유한 OFFICE-CENTER 거래 계약서의 부속 증거물 7호다.",
-            deep:    "KAIDEN: 과부하 오퍼레이터의 신체가 언더 구역에서 무엇에 사용되는지 그는 알고 있었다. 마크 바이러스를 인위적으로 안정화하는 배양 매체다 — 살아있는 인체가 2세대 감염자의 폭주 억제 장치로 쓰인다. CLINIC 치프가 설계하고, CENTER 헤드가 공급하고, OFFICE 디렉터가 묵인한다.",
-            suffix: { A: " CENTER는 제출자를 추적한다.", B: " 정보는 하이브 구역 벽면에 익명으로 나붙는다.", C: " 연기만이 진실의 목격자로 남는다." }
-        }
-    },
-    {
-        name: "NAYA — 17세, 하이브 구역",
-        meta: "2세대 선천성 마크 보유자\n사인: 학교 내 공명 폭주 — 건물 붕괴",
-        ritual_q: "그녀가 폭주하기 하루 전 당신에게 말했습니다. 그 말을 기억하겠습니까?",
-        ritual_opts: [
-            { label: "기억한다 — 그녀의 목소리로", modifier: "A" },
-            { label: "기억한다 — 하지만 누구에게도 말하지 않는다", modifier: "B" },
-            { label: "잊으려 했지만 실패했다", modifier: "C" }
-        ],
-        lore: {
-            surface: "NAYA: 하이브 학교 4층 교실에서 수업 중 폭주가 발생했다. 공명 파동이 건물 전체로 전이되어 붕괴됐다. 사망자 3명, 부상자 12명. CENTER가 즉각 투입됐다.",
-            hidden:  "NAYA: 폭주 전날, 그녀는 CLINIC 어시스트로부터 '완화 시술'을 받았다. 기록에 따르면 해당 시술은 No.4 화합물 투약이 포함되어 있었다 — 2세대에게 금지된 약물이다. CLINIC은 미성년자 대상 비공인 시험을 진행 중이었다.",
-            deep:    "NAYA: 그녀가 폭주 전 당신에게 말한 것 — '오늘 CLINIC에서 뭔가 이상한 걸 맞았어. 눈이 자꾸 빨간색으로 보여.' 그 시술을 지시한 닥터는 지금도 언더 구역에서 근무 중이다. 2세대 조기 폭주 유발 데이터를 수집하기 위한 실험이었다.",
-            suffix: { A: " 그 목소리가 당신의 코스트가 된다.", B: " 침묵은 공범보다 더 무거운 죄다.", C: " 망각은 선택이 아니었다." }
-        }
-    },
-    {
-        name: "DOC MIRREN — 45세, 언더 구역",
-        meta: "CLINIC 전직 어시스트\n사인: 언더 구역 격리실 내 자발적 코스트 방출",
-        ritual_q: "그가 마지막으로 제출한 연구 보고서 봉투가 당신 손에 왔습니다.",
-        ritual_opts: [
-            { label: "CLINIC 치프에게 돌려보낸다", modifier: "A" },
-            { label: "OFFICE 디렉터에게 익명으로 발송한다", modifier: "B" },
-            { label: "직접 개봉해 읽는다", modifier: "C" }
-        ],
-        lore: {
-            surface: "DOC MIRREN: 자발적 코스트 방출은 능력을 한계치까지 쏟아내 스스로 소진하는 방식의 사망이다. 유서는 발견되지 않았다.",
-            hidden:  "DOC MIRREN: 그의 마지막 보고서는 '완화 화합물의 역효과에 관한 내부 고발'이었다. 치프는 보고서를 수령한 즉시 소각 명령을 내렸고, MIRREN은 48시간 후 격리실에서 발견됐다. 공식 사인: 자발적 코스트 방출.",
-            deep:    "DOC MIRREN: 그 봉투 안에는 마크 바이러스가 자연 발생이 아님을 입증하는 초기 실험 데이터가 있다. 21년 전, 0.001% 감염률로 시작된 마크는 — 임계 설계된 생물학적 분리 도구였다. 목적: 능력자와 비능력자를 분리하여 전자를 특정 구역에 격리하는 것. COVE는 감옥이 아니라 수확지다.",
-            suffix: { A: " 보고서는 다시 불태워진다.", B: " OFFICE 디렉터는 수령 확인 후 침묵한다.", C: " 봉투 안의 내용이 당신의 세계관을 무너뜨린다." }
-        }
-    },
-    {
-        name: "TOMAS — 38세, 코어 구역",
-        meta: "OFFICE 전직 오피서\n사인: 단독 탈출 시도 중 포트 외각에서 사살",
-        ritual_q: "TOMAS가 탈출하려 한 이유를 당신은 알고 있습니다. 그 이유를 어떻게 처리하겠습니까?",
-        ritual_opts: [
-            { label: "OFFICE 내부 규정에 따라 보고한다", modifier: "A" },
-            { label: "그의 가족에게 전달한다", modifier: "B" },
-            { label: "혼자 간직한다", modifier: "C" }
-        ],
-        lore: {
-            surface: "TOMAS: OFFICE 오피서로 8년 근무 후 단독 탈출을 시도했다. 포트 외각 경계선에서 CENTER 오퍼레이터에게 제압, 사망. 공식 기록: 규정 위반 도주 중 코스트 과부하.",
-            hidden:  "TOMAS: 그가 탈출하려 했던 이유는 OFFICE 내부 문서에서 발견한 '격리 비용 정산 계획서' 때문이다. 5년 격리 후 출국한 감염자들의 개인 재산 및 능력 데이터가 외부 연구 기관에 자동 이전되는 구조가 숨겨져 있었다.",
-            deep:    "TOMAS: 계획서의 서명란에는 OFFICE 디렉터 외에 국제 협약 위원회 3개국 대표의 서명이 있었다. COVE는 국제 협약의 보호 아래 운영되는 것이 아니라 — 협약이 COVE를 위해 설계된 것이다. 감염자의 능력 데이터는 외부 군사 연구 집단에 20년째 공급되고 있다.",
-            suffix: { A: " 보고는 당신도 문서 속으로 집어넣는다.", B: " 가족은 이미 OFFICE의 감시 목록에 있다.", C: " 진실은 당신 안에서 썩는다." }
-        }
-    },
-    {
-        name: "GREY — 29세, 하이브 구역",
-        meta: "GARDEN 전직 텐더\n사인: 불명 — 수면 중 심정지 추정",
-        ritual_q: "GREY가 남긴 '오늘의 꽃' 명부에 당신의 이름이 적혀 있습니다. 어떻게 반응하겠습니까?",
-        ritual_opts: [
-            { label: "이름을 지운다", modifier: "A" },
-            { label: "명부를 그대로 보존한다", modifier: "B" },
-            { label: "명부 전체를 소각한다", modifier: "C" }
-        ],
-        lore: {
-            surface: "GREY: 그는 GARDEN의 가장 오랜 텐더였다. 수면 중 심정지로 추정되지만, 코스트 축적 흔적이 없다 — 능력 사용 없이는 설명할 수 없는 사망 방식이다.",
-            hidden:  "GREY: '오늘의 꽃' 명부에는 단순한 추모 기록 이상의 코드가 숨겨져 있다. 꽃의 종류와 배열이 GARDEN이 독자적으로 운용하는 암호 통신 방식이다. GREY는 그 코드의 유일한 해독자였으며 — 그가 죽은 날 GARDEN의 정보망 일부가 영구 단절됐다.",
-            deep:    "GREY: 그의 심정지는 능력의 역방향 압축이다. 누군가 그의 코스트를 강제로 역류시켰다 — 이 방식은 CLINIC만이 개발한 '역억제 시술'이다. GARDEN이 보유한 어떤 기밀이 특정 세력을 위협했는지, 그 내용은 아직 봉인 상태다. 키퍼만이 알고 있다.",
-            suffix: { A: " 이름이 지워지면 당신도 존재하지 않는 것이 된다.", B: " 명부는 다음 죽음을 예고하는 목록이다.", C: " 연기 속에서 모든 이름이 평등해진다." }
-        }
-    },
-    {
-        name: "VICTOR — 55세, 포트 구역",
-        meta: "항만 관리 인력 (등록 비능력자)\n사인: 폭주 사건 현장 피해로 인한 압사",
-        ritual_q: "그는 능력자가 아님에도 COVE를 떠나지 않았습니다. 왜였을지 당신의 생각은?",
-        ritual_opts: [
-            { label: "선택의 여지가 없었을 것이다", modifier: "A" },
-            { label: "이곳에 남기고 싶은 것이 있었을 것이다", modifier: "B" },
-            { label: "외부가 더 두려웠을 것이다", modifier: "C" }
-        ],
-        lore: {
-            surface: "VICTOR: COVE의 비능력자 관리 인력은 엄격히 제한된다. 그는 항만 하역 업무로 18년을 이곳에서 보냈다. 폭주 사건 현장 반경 50m 내에서 발견됐다.",
-            hidden:  "VICTOR: 비능력자 관리 인력의 실질 역할은 COVE 내부 정보를 외부 협약 위원회에 정기 보고하는 것이다. 그는 내부 감시자였다 — 그러나 18년 동안 COVE에서 진짜로 무엇을 보았는지, 보고서에 기록한 내용과 실제 목격한 것은 달랐다.",
-            deep:    "VICTOR: 그의 마지막 외부 보고서에는 두 버전이 존재한다. 위원회에 제출된 공식본과 — 그가 GARDEN에 남긴 사본. GARDEN 사본에는 COVE 설립 당시 국제 협약 위원회가 의도적으로 숨긴 조항이 명시되어 있다: '격리 대상자는 자발적 능력 데이터 제공에 묵시적으로 동의한 것으로 간주한다.' 비능력자 관리 인력은 그 조항의 증인으로 선발된다.",
-            suffix: { A: " 선택의 여지는 있었다. 단지 모든 선택지가 나빴을 뿐이다.", B: " 남기고 싶은 것들은 먼저 불탔다.", C: " 외부가 더 두려운 이유는 외부가 이곳을 설계했기 때문이다." }
-        }
-    },
-    {
-        name: "AIKO — 22세, 언더 구역",
-        meta: "언더 구역 거주 감염자\n사인: CLINIC 격리실 내 원인불명 소실",
-        ritual_q: "AIKO의 격리실에는 아무것도 남지 않았습니다. 흔적 없이 사라진 사람을 어떻게 기억하겠습니까?",
-        ritual_opts: [
-            { label: "기억할 수 없다 — 흔적이 없다면 존재도 없다", modifier: "A" },
-            { label: "존재했다는 사실 자체를 기억한다", modifier: "B" },
-            { label: "사라진 방식을 기억한다", modifier: "C" }
-        ],
-        lore: {
-            surface: "AIKO: 언더 구역 격리실 12호에서 발견 당시, 물리적 흔적이 일절 남아있지 않았다. CLINIC 공식 기록: 원인불명 자연 소실. 코스트 방출로 추정.",
-            hidden:  "AIKO: 원인불명 소실의 실체는 CLINIC이 개발한 '마크 역전이 정제' 실험 중 발생한 피험자 소실이다. 마크 바이러스를 강제로 역방향 전이시켜 능력을 제거하는 것이 목표였다 — 부작용으로 피험자의 신체 물질이 완전히 분해됐다. 실험은 계속 중이다.",
-            deep:    "AIKO: 그녀는 실험에 자원한 것이 아니었다. 역전이 실험 대상자는 CLINIC이 언더 구역에서 무작위로 선발한다 — 선발 기준은 '외부 연결망이 없는 감염자'다. 성공할 경우 마크 치료제로 공표할 예정이지만, 실패한 피험자들의 기록은 전부 소각된다. COVE 전체 감염자 중 17명이 이미 소실됐다.",
-            suffix: { A: " 흔적이 없어도 GARDEN은 기억한다.", B: " 존재했다는 사실이 가장 강력한 증거다.", C: " 사라진 방식을 기억하는 것이 다음 사람의 경고가 된다." }
-        }
-    },
-    {
-        name: "ROTH — 33세, 저층 구역",
-        meta: "CENTER 전직 트레이니\n사인: 훈련 중 코스트 역방향 리셋으로 인한 신경 소각",
-        ritual_q: "ROTH는 훈련 중 '이상하다'는 말을 남겼습니다. 그 말이 무엇을 의미하는지 당신은 압니다. 선택하세요.",
-        ritual_opts: [
-            { label: "CENTER에 신고한다", modifier: "A" },
-            { label: "다른 트레이니들에게 경고한다", modifier: "B" },
-            { label: "침묵을 선택한다", modifier: "C" }
-        ],
-        lore: {
-            surface: "ROTH: CENTER 트레이니 과정에서 코스트 역방향 리셋 훈련 중 신경 소각 판정. 공식 기록은 훈련 중 과부하로 기재됐다.",
-            hidden:  "ROTH: '이상하다'는 말의 의미 — 역방향 리셋 훈련 장비가 표준 사양이 아니었다. 훈련 강도가 조작되어 있었고, 트레이니들의 코스트 임계치를 의도적으로 초과시키는 설정이었다. CENTER 캡틴 중 한 명이 CLINIC과 데이터 계약을 맺고 훈련 과부하 데이터를 납품하고 있었다.",
-            deep:    "ROTH: 역방향 리셋 훈련이 실제로 테스트하는 것은 코스트 내성이 아니다 — 마크 바이러스가 신체 압력 하에서 얼마나 안정적으로 유지되는지를 측정하는 생체 스캔이다. 트레이니들은 살아있는 마크 데이터 측정 장치로 쓰이고 있다. CENTER는 이 사실을 조직 최상위 서열까지 알고 있다.",
-            suffix: { A: " CENTER는 신고자를 다음 측정 대상으로 분류한다.", B: " 경고는 당신의 코스트가 된다.", C: " 침묵은 공모다. 그러나 살아남는 방법이기도 하다." }
-        }
-    },
-    {
-        name: "MIN — 16세, 하이브 구역",
-        meta: "2세대 최연소 사망자\n사인: 미확인 — 등교 중 실종 후 72시간 후 항만 외곽 해안에서 발견",
-        ritual_q: "아이의 꽃을 누가 태워야 합니까?",
-        ritual_opts: [
-            { label: "가장 오래 알았던 사람이", modifier: "A" },
-            { label: "진실을 아는 사람이", modifier: "B" },
-            { label: "아무도 태우지 않아야 한다 — 진실이 드러날 때까지", modifier: "C" }
-        ],
-        lore: {
-            surface: "MIN: COVE 역사상 가장 어린 사망자. 실종 72시간 후 항만 외곽 해안 암초 지대에서 발견됐다. 사인: 불명. 2세대 특수 코스트 과부하로 잠정 처리.",
-            hidden:  "MIN: 등교 중 마지막으로 목격된 장소는 CLINIC 언더 구역 출입구 인근이다. 실종 신고 접수 6시간 전, CLINIC 방문 기록이 존재한다 — 보호자 동의 없는 미성년자 방문. 담당 어시스트는 현재 연락 불가 상태.",
-            deep:    "MIN: 16세는 2세대 중 마크 바이러스 활성도가 가장 높은 시기다. CLINIC의 마크 역전이 실험 대상으로 선발됐으며 — 실험은 성공했다. 마크가 제거됐지만 피험자는 소실됐다. 항만 외곽에서 발견된 것은 마크가 소거된 빈 신체였다. CLINIC은 최초 성공 사례를 '치료제 개발 가능성 확인'으로 내부 기록했다. 아이의 이름은 기록에 없다.",
-            suffix: { A: " 가장 오래 알았던 사람은 이미 울기를 멈췄다.", B: " 진실을 아는 사람은 CLINIC 치프밖에 없다.", C: " 꽃은 태워지지 않은 채 시들어간다." }
-        }
-    },
-    {
-        name: "ELARA — 41세, 코어 구역",
-        meta: "OFFICE 전직 카운슬러\n사인: 직책 박탈 후 하이브 구역 고층에서 낙하",
-        ritual_q: "ELARA는 박탈 이유를 '진실을 너무 많이 알았기 때문'이라고 했습니다. 그 진실은 지금 어디 있습니까?",
-        ritual_opts: [
-            { label: "그녀와 함께 사라졌다", modifier: "A" },
-            { label: "GARDEN에 분산 보관되어 있다", modifier: "B" },
-            { label: "이미 활성화되어 COVE 어딘가에서 움직이고 있다", modifier: "C" }
-        ],
-        lore: {
-            surface: "ELARA: 13년간 OFFICE 카운슬러로 근무했다. 직책 박탈 통보 3일 후 하이브 구역 고층에서 낙하 사망. OFFICE 공식 발표: 코스트 정신 부작용으로 인한 자발적 선택.",
-            hidden:  "ELARA: 직책 박탈의 실제 이유는 OFFICE 디렉터의 서명이 포함된 5년 격리 기간 조작 문서를 발견했기 때문이다. 출국 심사 기준이 서류상으로는 명확하지만 — 실제로는 특정 능력 유형 보유자의 출국이 영구 차단되어 있다. 이 능력자들은 외부 군사 연구에 가장 가치 있는 마크를 보유한다.",
-            deep:    "ELARA: 그녀가 발견한 것은 COVE의 진짜 목적이었다. 격리 도시가 아니라 — 능력자 등급별 분류 및 영구 확보 시설이다. S급과 일부 A급 감염자는 실질적으로 영원히 출국할 수 없다. OFFICE 디렉터도 이 구조의 피해자다 — 그 역시 외부 위원회의 꼭두각시에 불과하다. 진짜 결정권자는 COVE 밖에 있다.",
-            suffix: { A: " 진실은 죽음보다 가볍지 않다.", B: " GARDEN은 진실을 영원히 기억하지만 영원히 말하지 않는다.", C: " 활성화된 진실은 다음 사람을 찾고 있다." }
-        }
+    // --- GAME STATE ---
+    let engine, render, runner;
+    let currentFruit = null;
+    let nextIndex = getRandomFruitIndex();
+    let score = 0;
+    let globalCost = 0; 
+    let syncTotal = 0;
+    let syncOk = 0;
+    let syncConsecutive = 0;
+
+    let beatInterval = (60 / cfg.bpm) * 1000;
+    let lastBeatTime = Date.now();
+
+    // --- INITIALIZATION ---
+    function init() {
+        setupClock();
+        setupPhysics();
+        setupInteraction();
+        spawnNextFruit();
+        animateLoop();
     }
-];
 
-let selectedDeceased = null, selectedFlower = '', selectedFlowerTier = '', selectedRitualModifier = '';
-
-function initGarden() {
-    const list = document.getElementById('garden-profile-list');
-    const countEl = document.getElementById('garden-profile-count');
-    list.innerHTML = '';
-    if (countEl) countEl.textContent = DECEASED_DB.length;
-    DECEASED_DB.forEach((d) => {
-        const div = document.createElement('div');
-        div.className = 'deceased-row';
-        div.innerHTML = `<div class="deceased-name">${d.name}</div><div class="deceased-meta">${d.meta.replace(/\n/g,'<br>')}</div>`;
-        div.onclick = () => {
-            document.querySelectorAll('.deceased-row').forEach(r => r.classList.remove('selected'));
-            div.classList.add('selected');
-            selectedDeceased = d;
-            selectedRitualModifier = '';
-            updateRitualQuestion();
-            checkBurnReady();
-        };
-        list.appendChild(div);
-    });
-}
-initGarden();
-
-function updateRitualQuestion() {
-    const panel = document.getElementById('ritual-question-panel');
-    const qtxt = document.getElementById('ritual-q-text');
-    const optsContainer = document.getElementById('ritual-options-container');
-    if (!selectedDeceased || !selectedFlower) { panel.classList.remove('visible'); return; }
-    panel.classList.add('visible');
-    qtxt.textContent = selectedDeceased.ritual_q;
-    optsContainer.innerHTML = '';
-    selectedDeceased.ritual_opts.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'ritual-opt-btn';
-        btn.textContent = opt.label;
-        btn.onclick = () => {
-            document.querySelectorAll('.ritual-opt-btn').forEach(b => b.classList.remove('selected-ritual'));
-            btn.classList.add('selected-ritual');
-            selectedRitualModifier = opt.modifier;
-            checkBurnReady();
-        };
-        optsContainer.appendChild(btn);
-    });
-}
-
-function selectFlowerType(name, tier) {
-    selectedFlower = name; selectedFlowerTier = tier;
-    document.querySelectorAll('.flower-btn').forEach(b => b.classList.remove('selected-flower'));
-    event.currentTarget.classList.add('selected-flower');
-
-    const node = document.getElementById('altar-flower-node');
-    const badge = document.getElementById('garden-tier-badge');
-    const TIER_COLORS = { surface:'var(--color-garden)', hidden:'var(--color-office)', deep:'var(--color-center)' };
-    const TIER_LABELS = { surface:'표면 기밀 — TIER I', hidden:'심층 기밀 — TIER II', deep:'봉인 기밀 — TIER III' };
-    const TIER_CSS    = { surface:'tier-surface', hidden:'tier-hidden', deep:'tier-deep' };
-    node.style.borderColor = TIER_COLORS[tier];
-    node.style.boxShadow = `0 0 20px ${TIER_COLORS[tier]}66, inset 0 0 20px ${TIER_COLORS[tier]}22`;
-    if (badge) {
-        badge.style.display = 'block';
-        badge.className = 'garden-tier-indicator ' + TIER_CSS[tier];
-        badge.textContent = TIER_LABELS[tier];
+    function setupClock() {
+        setInterval(() => {
+            const now = new Date();
+            const pad = (n) => String(n).padStart(2, '0');
+            document.getElementById('time-stamp').textContent = 
+                `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} // L-NOD`;
+        }, 1000);
     }
-    updateRitualQuestion();
-    checkBurnReady();
-}
 
-function checkBurnReady() {
-    document.getElementById('burn-ritual-btn').disabled = !(selectedDeceased && selectedFlower && selectedRitualModifier);
-}
+    function setupPhysics() {
+        engine = Engine.create({ gravity: { y: 1.1 } });
 
-async function executeFlowerBurning() {
-    const btn  = document.getElementById('burn-ritual-btn');
-    const node = document.getElementById('altar-flower-node');
-    const lore = document.getElementById('garden-lore-box');
-    btn.disabled = true;
-    node.classList.add('burning');
-
-    const tierLabel = { surface:'표면 기밀 해제', hidden:'심층 기밀 해제', deep:'봉인 기밀 해제 ⚠' };
-    const tierColor = { surface:'var(--color-garden)', hidden:'var(--color-office)', deep:'var(--color-center)' };
-    lore.textContent = `>> 화염 채널 점화 중 [${tierLabel[selectedFlowerTier]}] ...\n잔존 흔적을 GARDEN 데이터베이스로 변환 중...`;
-    await wait(2600);
-    node.classList.remove('burning');
-
-    const loreTier = selectedDeceased.lore[selectedFlowerTier] || selectedDeceased.lore.surface;
-    const suffix = selectedDeceased.lore.suffix ? (selectedDeceased.lore.suffix[selectedRitualModifier] || '') : '';
-    const col = tierColor[selectedFlowerTier];
-    lore.innerHTML = `<strong style="color:${col};">[${tierLabel[selectedFlowerTier]} — ${selectedFlower.toUpperCase()} // ${selectedDeceased.name.split(' — ')[0]}]</strong>${loreTier}<em style="color:${col}; opacity:0.75;">${suffix}</em>`;
-
-    selectedDeceased = null; selectedFlower = ''; selectedFlowerTier = ''; selectedRitualModifier = '';
-    document.querySelectorAll('.deceased-row').forEach(r => r.classList.remove('selected'));
-    document.querySelectorAll('.flower-btn').forEach(b => b.classList.remove('selected-flower'));
-    document.querySelectorAll('.ritual-opt-btn').forEach(b => b.classList.remove('selected-ritual'));
-    document.getElementById('ritual-question-panel').classList.remove('visible');
-    node.style.borderColor = 'var(--color-garden)';
-    node.style.boxShadow = '';
-    const badge = document.getElementById('garden-tier-badge');
-    if (badge) badge.style.display = 'none';
-}
-
-// ============================================================
-// MODULE 5: CLINIC — COST RELIEF SYNC (EXPANDED)
-// ============================================================
-
-// Difficulty config
-const SYNC_DIFFICULTIES = {
-    DORMANT:  { labelKo:'휴면', speed:0.008, zoneMin:0.72, zoneMax:1.28, gaugeMax:15, costHeal:15, costPenalty:6,  tier:1 },
-    STABLE:   { labelKo:'안정', speed:0.013, zoneMin:0.84, zoneMax:1.16, gaugeMax:10, costHeal:12, costPenalty:8,  tier:2 },
-    ACTIVE:   { labelKo:'활성', speed:0.020, zoneMin:0.89, zoneMax:1.11, gaugeMax:7,  costHeal:10, costPenalty:10, tier:3 },
-    CRITICAL: { labelKo:'임계', speed:0.028, zoneMin:0.93, zoneMax:1.07, gaugeMax:5,  costHeal:8,  costPenalty:13, tier:4 },
-    RUNAWAY:  { labelKo:'폭주', speed:0.038, zoneMin:0.965,zoneMax:1.035,gaugeMax:3,  costHeal:6,  costPenalty:18, tier:5 }
-};
-
-// Tiered secrets for sync events
-const SYNC_SECRETS = [
-    // Tier 1 — DORMANT
-    {
-        tier: 1, title: "동기화 임계치 달성 — TIER I",
-        subtitle: "CLINIC UNDER // 1등급 기밀",
-        color: 'var(--color-clinic)',
-        body: `CLINIC 수석 어시스트의 일일 관찰 기록 —<br><br>
-"완화 화합물 No.3은 코스트 발생 빈도를 약 18% 감소시킨다.<br>
-그러나 피험자의 <span style="color:var(--color-clinic);">감정 반응 강도가 균일하게 저하</span>된다.<br>
-이것이 부작용인지 의도된 설계인지는 — 아직 묻지 않았다."`
-    },
-    // Tier 2 — STABLE
-    {
-        tier: 2, title: "동기화 임계치 달성 — TIER II",
-        subtitle: "OFFICE 내부 문서 // 2등급 기밀",
-        color: 'var(--color-office)',
-        body: `OFFICE 디렉터의 비공개 행정 지침서 발췌 —<br><br>
-"위험 등급 S / A-1 분류 감염자의 출국 신청은<br>
-표면적 절차를 준수하되 <span style="color:var(--color-office);">실질 승인 보류 코드 OMEGA-7</span>을 적용한다.<br>
-대상자에게는 '검토 중' 통보를 유지할 것.<br>
-검토 기한: 무기한."`
-    },
-    // Tier 3 — ACTIVE
-    {
-        tier: 3, title: "동기화 임계치 달성 — TIER III",
-        subtitle: "CENTER 내부 집행 로그 // 3등급 기밀",
-        color: '#a855f7',
-        body: `CENTER 헤드의 암호화 통신 로그 복원 —<br><br>
-"2세대 폭주 유발 실험 3차분 납품 완료.<br>
-<span style="color:#a855f7;">언더 구역 배양 기질 12구획</span> 활성화 상태 유지 중.<br>
-CLINIC 치프 — 다음 공급 대상자 목록 수령 확인.<br>
-OFFICE 디렉터 — 가족 연락망 차단 조치 완료.<br>
-이번 분기 납품 목표: 예정 초과 달성."`
-    },
-    // Tier 4 — CRITICAL
-    {
-        tier: 4, title: "동기화 임계치 달성 — TIER IV",
-        subtitle: "국제 협약 위원회 // 4등급 봉인 기밀",
-        color: 'var(--color-office)',
-        body: `국제 협약 위원회 비공개 회의록 // 21년 전 —<br><br>
-"마크 바이러스 최초 공개 발표 이전,<br>
-<span style="color:var(--color-office);">격리 구역 설립 결의안은 이미 3년 전 서명됐다.</span><br>
-바이러스는 자연 발생이 아니다.<br>
-COVE는 감염자를 보호하기 위해 설립되지 않았다.<br>
-능력자를 <span style="color:var(--color-office);">분리, 분류, 확보</span>하기 위한 시설이다.<br>
-격리 협약 조인국 전원 동의. 반대표 0."`
-    },
-    // Tier 5 — RUNAWAY
-    {
-        tier: 5, title: "동기화 임계치 달성 — TIER V",
-        subtitle: "⚠ 최고 등급 봉인 해제 // 열람 권한 없음",
-        color: 'var(--color-center)',
-        body: `GARDEN 키퍼의 최후 봉인 기록 —<br><br>
-"마크 바이러스의 감염률 0.001%는 우연이 아니다.<br>
-<span style="color:var(--color-center);">설계된 비율이다.</span> 목표는 전 인류 중<br>
-통제 가능한 규모의 능력자를 선별하는 것.<br>
-COVE는 수확지다 — 능력 데이터, 생체 기질, 2세대 유전 계보.<br>
-그리고 우리는 21년째 <span style="color:var(--color-center);">알고도 남아있다.</span><br><br>
-이곳을 떠나지 않는 것은 — 경제적 이유만이 아니다.<br>
-외부는 이미 우리를 포기했다. COVE가 세계다."`
-    }
-];
-
-let pulseScale = 0.1;
-let clinicPulseEl = document.getElementById('clinic-pulse-ring');
-let hitFlash = document.getElementById('pulse-hit-flash');
-let syncOk = 0, syncTotal = 0;
-let syncLoopActive = true;
-let syncGaugeCount = 0;
-let syncWave = 1;
-let syncSpeedMult = 1.0;
-let syncConsecutive = 0; // combo counter
-let currentDiff = 'DORMANT';
-let unlockedSecretTiers = new Set();
-
-function setDifficulty(diff) {
-    currentDiff = diff;
-    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('diff-active'));
-    const btn = document.getElementById('diff-' + diff);
-    if (btn) btn.classList.add('diff-active');
-    const cfg = SYNC_DIFFICULTIES[diff];
-    // Update gauge max display and reset gauge
-    syncGaugeCount = 0;
-    updateSyncGauge();
-    // Update arena label
-    const label = document.getElementById('clinic-arena-label');
-    if (label) label.textContent = `ANCHOR 동기화 // ${cfg.labelKo.toUpperCase()} MODE — TIER ${cfg.tier}`;
-    // Update tier label in header
-    const tierLabel = document.getElementById('diff-tier-label');
-    if (tierLabel) tierLabel.textContent = `Tier ${cfg.tier}`;
-    // Update target zone visual size based on difficulty
-    const targetZone = document.getElementById('pulse-target-zone-el');
-    if (targetZone) {
-        const zoneSize = 150 * (cfg.zoneMax - cfg.zoneMin) / 0.56 * 0.62 + 80;
-        // Visually adjust target zone width/height
-        const baseSize = 150;
-        const innerRatio = (cfg.zoneMax - cfg.zoneMin) / 0.56; // normalize to default range
-        const visualSize = Math.max(60, Math.min(150, baseSize * innerRatio));
-        targetZone.style.width  = visualSize + 'px';
-        targetZone.style.height = visualSize + 'px';
-    }
-    updateSpeedUI();
-}
-
-function updateSpeedUI() {
-    const mult = syncSpeedMult;
-    const bar = document.getElementById('sync-speed-bar');
-    const multEl = document.getElementById('sync-speed-mult');
-    const waveEl = document.getElementById('sync-wave-num');
-    const pct = Math.min(100, ((mult - 1.0) / 1.5) * 100 + 5);
-    if (bar) {
-        bar.style.width = pct + '%';
-        bar.style.background = mult >= 2.0 ? 'var(--color-center)' : mult >= 1.5 ? 'var(--color-office)' : 'var(--color-clinic)';
-    }
-    if (multEl) multEl.textContent = '×' + mult.toFixed(1);
-    if (waveEl) waveEl.textContent = syncWave;
-}
-
-// 클리닉 이벤트 모달 HTML 삽입
-(function injectClinicEventModal() {
-    const modal = document.createElement('div');
-    modal.id = 'clinic-event-modal';
-    modal.style.cssText = `
-        position:fixed; inset:0; z-index:9999;
-        background:rgba(0,5,18,0.95);
-        display:none; flex-direction:column;
-        justify-content:center; align-items:center; gap:24px;
-        backdrop-filter:blur(14px);
-    `;
-    modal.innerHTML = `
-        <div id="clinic-event-tier-tag" style="font-family:var(--font-display); font-size:9px; letter-spacing:6px; color:var(--color-clinic); margin-bottom:-6px;">CLINIC UNDER // 기밀 해제</div>
-        <div id="clinic-event-title" style="font-family:var(--font-display); font-size:26px; font-weight:900; letter-spacing:4px; color:#fff; text-shadow:0 0 30px rgba(0,229,255,0.8); text-align:center; line-height:1.3;">
-            동기화 임계치 달성<br>
-            <span id="clinic-event-subtitle" style="font-size:12px; letter-spacing:6px; color:var(--color-clinic);">SYNC THRESHOLD REACHED</span>
-        </div>
-        <div id="clinic-event-body" style="
-            max-width:90%; width: 580px; padding:28px 36px;
-            border:1px solid rgba(0,229,255,0.3);
-            background:rgba(0,15,30,0.85);
-            font-family:var(--font-mono); font-size:12px;
-            line-height:2.1; color:#9ab4d4; text-align:center;
-            box-shadow:0 0 60px rgba(0,229,255,0.08);
-            position:relative;
-        ">
-            <div style="position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--color-clinic),transparent);"></div>
-        </div>
-        <div style="display:flex; gap:14px; flex-wrap:wrap; justify-content:center;">
-            <button onclick="closeClinicEvent(false)" style="
-                background:transparent; border:1px solid var(--color-clinic);
-                color:var(--color-clinic); font-family:var(--font-display);
-                font-size:10px; font-weight:700; padding:13px 36px;
-                letter-spacing:3px; cursor:pointer; transition:all 0.2s;
-                box-shadow:0 0 15px rgba(0,229,255,0.12);
-            ">기록 확인 완료</button>
-            <button onclick="closeClinicEvent(true)" style="
-                background:transparent; border:1px solid rgba(255,82,82,0.4);
-                color:rgba(255,82,82,0.7); font-family:var(--font-display);
-                font-size:10px; font-weight:700; padding:13px 36px;
-                letter-spacing:3px; cursor:pointer; transition:all 0.2s;
-            ">난이도 상승 후 계속</button>
-        </div>
-        <div id="clinic-secret-archive" style="font-family:var(--font-mono); font-size:10px; color:var(--text-muted); letter-spacing:1px; margin-top:-8px;"></div>
-    `;
-    document.body.appendChild(modal);
-})();
-
-function closeClinicEvent(escalate) {
-    document.getElementById('clinic-event-modal').style.display = 'none';
-    if (escalate) {
-        // escalate difficulty
-        const order = ['DORMANT','STABLE','ACTIVE','CRITICAL','RUNAWAY'];
-        const idx = order.indexOf(currentDiff);
-        if (idx < order.length - 1) setDifficulty(order[idx + 1]);
-        // increase wave and speed
-        syncWave++;
-        syncSpeedMult = Math.min(2.5, syncSpeedMult * 1.18);
-        updateSpeedUI();
-    }
-    syncGaugeCount = 0;
-    updateSyncGauge();
-}
-
-function triggerClinicEvent() {
-    const cfg = SYNC_DIFFICULTIES[currentDiff];
-    const secret = SYNC_SECRETS.find(s => s.tier === cfg.tier) || SYNC_SECRETS[0];
-    unlockedSecretTiers.add(cfg.tier);
-
-    const modal  = document.getElementById('clinic-event-modal');
-    const tag    = document.getElementById('clinic-event-tier-tag');
-    const title  = document.getElementById('clinic-event-title');
-    const sub    = document.getElementById('clinic-event-subtitle');
-    const body   = document.getElementById('clinic-event-body');
-    const arch   = document.getElementById('clinic-secret-archive');
-
-    tag.style.color    = secret.color;
-    tag.textContent    = secret.subtitle;
-    sub.style.color    = secret.color;
-    sub.textContent    = `WAVE ${syncWave} // TIER ${cfg.tier} 기밀 해제`;
-    title.style.textShadow = `0 0 30px ${secret.color}99`;
-    body.style.borderColor = secret.color + '55';
-    body.style.boxShadow   = `0 0 60px ${secret.color}15`;
-    body.querySelector('div').style.background = `linear-gradient(90deg, transparent, ${secret.color}, transparent)`;
-    body.innerHTML = `<div style="position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,${secret.color},transparent);"></div>
-        <span style="color:${secret.color}; display:block; margin-bottom:14px; letter-spacing:3px; font-size:11px;">[봉인 해제 — ${secret.subtitle}]</span>
-        ${secret.body}`;
-    arch.textContent = `해제된 기밀: Tier ${[...unlockedSecretTiers].sort().join(', ')} / 5`;
-
-    modal.style.display = 'flex';
-}
-
-function updateSyncGauge() {
-    const cfg = SYNC_DIFFICULTIES[currentDiff];
-    const bar   = document.getElementById('sync-progress-bar');
-    const count = document.getElementById('sync-gauge-count');
-    if (bar)   bar.style.width = (syncGaugeCount / cfg.gaugeMax * 100) + '%';
-    if (count) count.textContent = syncGaugeCount + ' / ' + cfg.gaugeMax;
-}
-
-function runClinicLoop() {
-    if (!syncLoopActive) return;
-    const cfg = SYNC_DIFFICULTIES[currentDiff];
-    const speed = cfg.speed * syncSpeedMult;
-    pulseScale += speed;
-    if (pulseScale >= 2.2) {
-        pulseScale = 0.1;
-    }
-    const size = 150 * pulseScale;
-    clinicPulseEl.style.width  = size + 'px';
-    clinicPulseEl.style.height = size + 'px';
-    clinicPulseEl.style.opacity = Math.max(0, 1 - pulseScale / 2.2);
-    requestAnimationFrame(runClinicLoop);
-}
-runClinicLoop();
-
-function checkClinicSyncTiming() {
-    syncTotal++;
-    const cfg = SYNC_DIFFICULTIES[currentDiff];
-    const resultEl = document.getElementById('sync-result-display');
-    const inZone = pulseScale >= cfg.zoneMin && pulseScale <= cfg.zoneMax;
-
-    if (inZone) {
-        syncOk++;
-        syncConsecutive++;
-        const isCombo = syncConsecutive >= 3;
-        const gaugeGain = isCombo ? 2 : 1;
-        globalCost = Math.max(0, globalCost - cfg.costHeal);
-        updateCostBar();
-        syncGaugeCount = Math.min(cfg.gaugeMax, syncGaugeCount + gaugeGain);
-        updateSyncGauge();
-
-        if (syncGaugeCount >= cfg.gaugeMax) {
-            setTimeout(triggerClinicEvent, 400);
-        }
-
-        // combo flash
-        if (isCombo) {
-            const comboEl = document.getElementById('combo-flash-text');
-            if (comboEl) {
-                comboEl.textContent = `COMBO ×${syncConsecutive}`;
-                comboEl.style.opacity = '1';
-                comboEl.style.transition = 'opacity 0.05s';
-                setTimeout(() => { comboEl.style.transition = 'opacity 0.8s'; comboEl.style.opacity = '0'; }, 600);
+        render = Render.create({
+            canvas: document.getElementById('game-canvas'),
+            engine: engine,
+            options: {
+                width: cfg.canvasWidth,
+                height: cfg.canvasHeight,
+                background: 'transparent',
+                wireframes: false
             }
-            customCursor.style.boxShadow = '0 0 25px var(--color-office)';
-            setTimeout(() => customCursor.style.boxShadow = '', 400);
-        }
+        });
 
-        // hit flash
-        hitFlash.style.opacity = '1';
-        hitFlash.style.borderColor = isCombo ? 'var(--color-office)' : 'var(--color-clinic)';
-        hitFlash.style.boxShadow = isCombo
-            ? '0 0 30px var(--color-office), 0 0 60px rgba(240,180,41,0.3)'
-            : '0 0 30px var(--color-clinic), 0 0 60px rgba(0,229,255,0.3)';
-        hitFlash.style.transition = 'opacity 0.05s';
-        setTimeout(() => { hitFlash.style.transition = 'opacity 0.5s'; hitFlash.style.opacity = '0'; }, 80);
+        Render.run(render);
+        runner = Runner.create();
+        Runner.run(runner, engine);
 
-        if (!isCombo) customCursor.style.boxShadow = '0 0 25px var(--color-clinic)';
-        setTimeout(() => customCursor.style.boxShadow = '', 300);
-        resultEl.style.color = isCombo ? 'var(--color-office)' : 'var(--color-clinic)';
-        resultEl.style.textShadow = isCombo ? '0 0 10px var(--color-office)' : '0 0 10px var(--color-clinic)';
-        resultEl.textContent = isCombo ? `COMBO! +${gaugeGain}게이지` : 'SYNC 성공';
-        resultEl.style.opacity = '1';
-    } else {
-        syncConsecutive = 0;
-        globalCost = Math.min(100, globalCost + cfg.costPenalty);
-        updateCostBar();
-        customCursor.style.boxShadow = '0 0 20px var(--color-center)';
-        setTimeout(() => customCursor.style.boxShadow = '', 300);
-        resultEl.style.color = 'var(--color-center)';
-        resultEl.style.textShadow = '0 0 10px var(--color-center)';
-        resultEl.textContent = '타이밍 미스';
-        resultEl.style.opacity = '1';
+        // Walls
+        const wallOptions = { isStatic: true, render: { fillStyle: 'rgba(80, 160, 255, 0.08)' } };
+        const ground = Bodies.rectangle(cfg.canvasWidth / 2, cfg.canvasHeight + 30, cfg.canvasWidth, 80, wallOptions);
+        const leftWall = Bodies.rectangle(-30, cfg.canvasHeight / 2, 80, cfg.canvasHeight, wallOptions);
+        const rightWall = Bodies.rectangle(cfg.canvasWidth + 30, cfg.canvasHeight / 2, 80, cfg.canvasHeight, wallOptions);
+        
+        // DeadLine Indicator line
+        const deadLine = Bodies.rectangle(cfg.canvasWidth / 2, 130, cfg.canvasWidth, 2, {
+            isStatic: true,
+            isSensor: true,
+            render: { fillStyle: 'rgba(255, 0, 123, 0.25)' }
+        });
+
+        Composite.add(engine.world, [ground, leftWall, rightWall, deadLine]);
+
+        // Collision Handler
+        Events.on(engine, 'collisionStart', (event) => {
+            const pairs = event.pairs;
+            for (let i = 0; i < pairs.length; i++) {
+                const pair = pairs[i];
+                if (pair.bodyA.label && pair.bodyB.label && 
+                    pair.bodyA.label.startsWith('fruit_') && pair.bodyB.label.startsWith('fruit_')) {
+                    
+                    const idxA = parseInt(pair.bodyA.label.split('_')[1]);
+                    const idxB = parseInt(pair.bodyB.label.split('_')[1]);
+
+                    if (idxA === idxB && idxA < FRUIT_CLASSES.length - 1) {
+                        if (pair.bodyA.isDead || pair.bodyB.isDead) continue;
+                        pair.bodyA.isDead = true;
+                        pair.bodyB.isDead = true;
+
+                        const posA = pair.bodyA.position;
+                        const posB = pair.bodyB.position;
+                        const midX = (posA.x + posB.x) / 2;
+                        const midY = (posA.y + posB.y) / 2;
+
+                        Composite.remove(engine.world, [pair.bodyA, pair.bodyB]);
+
+                        score += FRUIT_CLASSES[idxA].score;
+                        document.getElementById('score-val').textContent = String(score).padStart(6, '0');
+
+                        setTimeout(() => {
+                            const nextFruit = createFruit(midX, midY, idxA + 1);
+                            Composite.add(engine.world, nextFruit);
+                            addLog(`[CONVERGE] ${FRUIT_CLASSES[idxA].name} 융합 -> 단계 상승`, 'success');
+                        }, 25);
+                    }
+                }
+            }
+        });
+
+        // Game Over Verification Loop
+        setInterval(() => {
+            const bodies = Composite.allBodies(engine.world);
+            bodies.forEach(b => {
+                if (b.label && b.label.startsWith('fruit_') && !b.isStatic) {
+                    if (b.position.y < 130) {
+                        // 패널티 가중치가 높을 때 라인을 넘어가면 경고 발생
+                        if(!b.warned) {
+                            b.warned = true;
+                            addLog(`[ALERT] ${b.label.toUpperCase()} 임계 고도 돌파!`, 'danger');
+                        }
+                    }
+                }
+            });
+        }, 1000);
     }
 
-    setTimeout(() => { resultEl.style.opacity = '0'; }, 700);
-    updateClinicStats();
-}
+    function createFruit(x, y, index, isStatic = false) {
+        const info = FRUIT_CLASSES[index];
+        const body = Bodies.circle(x, y, info.radius, {
+            label: `fruit_${index}`,
+            restitution: 0.25,
+            friction: 0.08,
+            density: 0.001,
+            isStatic: isStatic,
+            render: {
+                // 수박게임 서브 도면 이미지 바인딩 및 해상도 비율 크기 역조정(스케일링) 설정
+                sprite: {
+                    texture: info.image,
+                    xScale: (info.radius * 2) / IMAGE_BASE_SIZE,
+                    yScale: (info.radius * 2) / IMAGE_BASE_SIZE
+                }
+            }
+        });
+        return body;
+    }
 
-function updateClinicStats() {
-    const rate = syncTotal === 0 ? 100 : Math.round(syncOk / syncTotal * 100);
-    const txt = `안정화율: ${rate}% // SYNC 성공: ${syncOk}회 // 콤보: ${syncConsecutive}`;
-    document.getElementById('clinic-sync-stats').textContent = txt;
-    document.getElementById('clinic-sync-stats-bottom').textContent = txt;
-}
+    function getRandomFruitIndex() {
+        // 초반 난이도 조절을 위해 0~4단계 유닛만 스폰 가능하도록 설정
+        return Math.floor(Math.random() * 5);
+    }
 
-// init
-updateCostBar();
-updateSyncGauge();
-setDifficulty('DORMANT');
+    function spawnNextFruit() {
+        const canvas = document.getElementById('game-canvas');
+        const defaultX = canvas.width / 2;
+        
+        currentFruit = createFruit(defaultX, cfg.dropY, nextIndex, true);
+        Composite.add(engine.world, currentFruit);
+        
+        nextIndex = getRandomFruitIndex();
+        updatePreviewCanvas();
+    }
 
+    function updatePreviewCanvas() {
+        const canvas = document.getElementById('next-preview-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const info = FRUIT_CLASSES[nextIndex];
+        
+        // 미리보기 박스 전용 이미지 그리기 매핑 구현
+        const img = new Image();
+        img.src = info.image;
+        img.onload = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // 캔버스 크기(80x80) 내부 규격에 맞춰 비율 크기 조정
+            const displaySize = Math.min(info.radius * 1.4, 46);
+            ctx.drawImage(img, canvas.width / 2 - displaySize / 2, canvas.height / 2 - displaySize / 2 - 6, displaySize, displaySize);
+            
+            ctx.fillStyle = '#d1f4ff';
+            ctx.font = '9px Share Tech Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(info.name, canvas.width / 2, canvas.height - 4);
+        };
+
+        // 로드 전 폴백 기본 데이터 표현
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, canvas.height / 2 - 6, Math.min(info.radius, 20), 0, Math.PI * 2);
+        ctx.fillStyle = info.color;
+        ctx.fill();
+        ctx.fillStyle = '#d1f4ff';
+        ctx.font = '9px Share Tech Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(info.name, canvas.width / 2, canvas.height - 4);
+    }
+
+    function setupInteraction() {
+        const centerPanel = document.getElementById('center-panel');
+        const canvas = document.getElementById('game-canvas');
+        const cursorEl = document.getElementById('custom-cursor');
+
+        centerPanel.addEventListener('mouseenter', () => { cursorEl.style.display = 'block'; });
+        centerPanel.addEventListener('mouseleave', () => { cursorEl.style.display = 'none'; });
+
+        centerPanel.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            
+            // 전용 커서 컴포넌트 마운트 처리
+            cursorEl.style.left = e.clientX + 'px';
+            cursorEl.style.top = e.clientY + 'px';
+
+            if (currentFruit && currentFruit.isStatic) {
+                const radius = FRUIT_CLASSES[parseInt(currentFruit.label.split('_')[1])].radius;
+                // 벽 충돌 한계값 클램핑
+                let targetX = Math.max(radius + 5, Math.min(cfg.canvasWidth - radius - 5, mouseX));
+                Body.setPosition(currentFruit, { x: targetX, y: cfg.dropY });
+            }
+        });
+
+        centerPanel.addEventListener('click', () => {
+            if (!currentFruit || !currentFruit.isStatic) return;
+
+            // 리듬 싱크 시스템 판정 스코어 계산
+            syncTotal++;
+            const now = Date.now();
+            const timeSinceLastBeat = (now - lastBeatTime) % beatInterval;
+            const threshold = 140; // 판정 범위 (ms)
+
+            const isSync = (timeSinceLastBeat < threshold || (beatInterval - timeSinceLastBeat) < threshold);
+            handleSyncResult(isSync);
+
+            // 물리 시뮬레이션 적용 활성화 분리 처리
+            Body.setStatic(currentFruit, false);
+            currentFruit = null;
+
+            setTimeout(() => {
+                spawnNextFruit();
+            }, 650);
+        });
+    }
+
+    function handleSyncResult(isSuccess) {
+        const resultEl = document.getElementById('sync-indicator');
+        const customCursor = document.getElementById('custom-cursor');
+
+        if (isSuccess) {
+            syncOk++;
+            syncConsecutive++;
+            // 코스트 경감 및 보너스 수치 연계 연산
+            globalCost = Math.max(0, globalCost - 5);
+            updateCostBar();
+            
+            document.getElementById('combo-val').textContent = `X ${syncConsecutive}`;
+
+            const isCombo = syncConsecutive >= 3;
+            const gaugeGain = isCombo ? 2 : 1;
+            
+            customCursor.style.width = '45px';
+            customCursor.style.height = '45px';
+            setTimeout(() => { customCursor.style.width = '30px'; customCursor.style.height = '30px'; }, 80);
+
+            if (!isCombo) customCursor.style.boxShadow = '0 0 25px var(--color-clinic)';
+            setTimeout(() => customCursor.style.boxShadow = '', 300);
+            
+            resultEl.style.color = isCombo ? 'var(--color-office)' : 'var(--color-clinic)';
+            resultEl.style.textShadow = isCombo ? '0 0 10px var(--color-office)' : '0 0 10px var(--color-clinic)';
+            resultEl.textContent = isCombo ? `COMBO! +${gaugeGain}게이지` : 'SYNC 성공';
+            resultEl.style.opacity = '1';
+        } else {
+            syncConsecutive = 0;
+            document.getElementById('combo-val').textContent = `X 0`;
+            globalCost = Math.min(100, globalCost + cfg.costPenalty);
+            updateCostBar();
+            
+            customCursor.style.boxShadow = '0 0 20px var(--color-center)';
+            setTimeout(() => customCursor.style.boxShadow = '', 300);
+            
+            resultEl.style.color = 'var(--color-center)';
+            resultEl.style.textShadow = '0 0 10px var(--color-center)';
+            resultEl.textContent = '타이밍 미스';
+            resultEl.style.opacity = '1';
+        }
+
+        setTimeout(() => { resultEl.style.opacity = '0'; }, 700);
+        updateClinicStats();
+    }
+
+    function updateClinicStats() {
+        const rate = syncTotal === 0 ? 100 : Math.round((syncOk / syncTotal) * 100);
+        document.getElementById('sync-rate-val').textContent = `${rate}%`;
+    }
+
+    function updateCostBar() {
+        const bar = document.getElementById('cost-fill');
+        const txt = document.getElementById('cost-percent-val');
+        bar.style.width = `${globalCost}%`;
+        txt.textContent = `${Math.round(globalCost)}%`;
+    }
+
+    function addLog(text, type = 'system') {
+        const container = document.getElementById('log-container');
+        const entry = document.createElement('div');
+        entry.className = `log-entry ${type}`;
+        
+        const now = new Date();
+        const timeStr = `[${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}]`;
+        
+        entry.textContent = `${timeStr} ${text}`;
+        container.appendChild(entry);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function animateLoop() {
+        const now = Date.now();
+        if (now - lastBeatTime >= beatInterval) {
+            lastBeatTime = now;
+        }
+
+        // 오버히트 코스트 자연 감소 알고리즘 처리
+        if (globalCost > 0) {
+            globalCost = Math.max(0, globalCost - cfg.costDecay);
+            updateCostBar();
+        }
+
+        requestAnimationFrame(animateLoop);
+    }
+
+    window.onload = init;
 </script>
 </body>
 </html>
