@@ -9,7 +9,7 @@
     <style>
         :root {
             --bg-deep: #04070f;
-            --bg-panel: rgba(8, 14, 26, 0.82);
+            --bg-panel: rgba(8, 14, 26, 0.93);
             --bg-hover: rgba(20, 35, 60, 0.6);
 
             --border-dim: rgba(80, 160, 255, 0.1);
@@ -71,9 +71,13 @@
         /* chromatic aberration vignette */
         .vignette-overlay {
             position: fixed; inset: 0;
-            background: radial-gradient(ellipse at center,
-                transparent 40%,
-                rgba(0,5,20,0.7) 100%);
+            background:
+                radial-gradient(ellipse at center,
+                    transparent 40%,
+                    rgba(0,5,20,0.7) 100%),
+                radial-gradient(ellipse at center,
+                    rgba(4,10,28,0) 10%,
+                    rgba(2,5,18,0.3) 100%);
             pointer-events: none; z-index: 9997;
         }
 
@@ -137,8 +141,7 @@
         header {
             height: 64px; flex-shrink: 0;
             border-bottom: 1px solid var(--border-mid);
-            background: rgba(4,8,18,0.95);
-            backdrop-filter: blur(20px);
+            background: rgba(4,8,18,0.97);
             display: flex; align-items: center;
             padding: 0 32px; gap: 0;
             position: relative;
@@ -255,9 +258,9 @@
         /* ── PANELS ── */
         .side-hud-bar {
             width: 300px; flex-shrink: 0;
+            position: relative;
             background: var(--bg-panel);
             border: 1px solid var(--border-dim);
-            backdrop-filter: blur(16px);
             padding: 22px;
             display: flex; flex-direction: column; gap: 22px;
             box-shadow: inset 0 0 40px rgba(0,0,0,0.3), 0 0 0 0.5px rgba(80,160,255,0.05);
@@ -274,7 +277,6 @@
             flex: 1;
             background: var(--bg-panel);
             border: 1px solid var(--border-dim);
-            backdrop-filter: blur(16px);
             position: relative;
             display: flex; flex-direction: column;
             overflow: hidden;
@@ -396,11 +398,14 @@
         .db-row-item:hover { background: rgba(80,160,255,0.04); }
 
         .db-circle-color {
-            width: 18px; height: 18px;
+            width: 22px; height: 22px;
             border-radius: 50%; flex-shrink: 0;
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 0 6px currentColor;
+            border: 1px solid rgba(255,255,255,0.25);
+            display: block;
         }
+
+        .db-row-item.locked .db-name { color: var(--text-muted); }
+        .db-row-item.locked .db-circle-color { opacity: 0.45; }
 
         .db-name {
             flex: 1; font-family: var(--font-mono);
@@ -415,6 +420,17 @@
             display: none; flex-direction: column;
             justify-content: center; align-items: center;
             z-index: 100; gap: 18px;
+        }
+
+        .suika-final-line {
+            font-family: var(--font-mono);
+            font-size: 12px; letter-spacing: 2px;
+            color: var(--text-muted);
+        }
+        .suika-final-line b {
+            color: var(--color-clinic);
+            font-family: var(--font-display);
+            font-size: 20px; letter-spacing: 2px;
         }
 
         .glitch-title {
@@ -813,9 +829,20 @@
 
         .pulse-expanding-ring {
             position: absolute;
-            width: 10px; height: 10px;
+            width: 150px; height: 150px;
             border: 2px solid var(--color-clinic);
             border-radius: 50%; opacity: 0;
+            pointer-events: none;
+            transform: scale(0.1);
+            will-change: transform, opacity;
+        }
+
+        /* 판정 구간 안쪽 경계 — 바깥 원과의 사이가 실제 SYNC 성공 구간 */
+        .pulse-zone-inner {
+            position: absolute;
+            width: 120px; height: 120px;
+            border: 1px dashed rgba(0,229,255,0.22);
+            border-radius: 50%;
             pointer-events: none;
         }
 
@@ -894,13 +921,15 @@
         /* ── CUSTOM CURSOR ── */
         #custom-cursor {
             position: fixed;
+            top: 0; left: 0;
             width: 26px; height: 26px;
             border: 1px solid rgba(0,229,255,0.5);
             border-radius: 50%;
             pointer-events: none;
-            transform: translate(-50%, -50%);
+            transform: translate3d(-100px, -100px, 0);
             z-index: 100000;
-            transition: width 0.1s, height 0.1s, box-shadow 0.2s;
+            will-change: transform;
+            transition: box-shadow 0.2s;
         }
         #custom-cursor::before, #custom-cursor::after {
             content: '';
@@ -1051,6 +1080,76 @@
             box-shadow: 0 0 8px var(--color-clinic);
         }
 
+        /* ── CLINIC EVENT MODAL ── */
+        .clinic-modal {
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(0,5,18,0.97);
+            display: none; flex-direction: column;
+            justify-content: center; align-items: center; gap: 24px;
+            padding: 24px; overflow-y: auto;
+        }
+        .clinic-modal-tag {
+            font-family: var(--font-display);
+            font-size: 9px; letter-spacing: 6px;
+            color: var(--color-clinic); margin-bottom: -6px;
+            text-align: center;
+        }
+        .clinic-modal-title {
+            font-family: var(--font-display);
+            font-size: 26px; font-weight: 900; letter-spacing: 4px;
+            color: #fff; text-shadow: 0 0 30px rgba(0,229,255,0.8);
+            text-align: center; line-height: 1.3;
+        }
+        .clinic-modal-sub {
+            font-size: 12px; letter-spacing: 6px;
+            color: var(--color-clinic);
+        }
+        .clinic-modal-body {
+            max-width: 90%; width: 580px; padding: 28px 36px;
+            border: 1px solid rgba(0,229,255,0.3);
+            background: rgba(0,15,30,0.85);
+            font-family: var(--font-mono); font-size: 12px;
+            line-height: 2.1; color: #9ab4d4; text-align: center;
+            box-shadow: 0 0 60px rgba(0,229,255,0.08);
+            position: relative;
+        }
+        .clinic-modal-body-line {
+            position: absolute; top: 0; left: 0; right: 0; height: 1px;
+        }
+        .clinic-modal-actions {
+            display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+        }
+        .clinic-modal-btn {
+            background: transparent;
+            border: 1px solid var(--color-clinic);
+            color: var(--color-clinic);
+            font-family: var(--font-display);
+            font-size: 10px; font-weight: 700;
+            padding: 13px 36px; letter-spacing: 3px;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 0 15px rgba(0,229,255,0.12);
+        }
+        .clinic-modal-btn:hover { background: rgba(0,229,255,0.1); }
+        .clinic-modal-btn.danger {
+            border-color: rgba(255,82,82,0.4);
+            color: rgba(255,82,82,0.75);
+            box-shadow: none;
+        }
+        .clinic-modal-btn.danger:hover { background: rgba(255,82,82,0.08); }
+        .clinic-modal-archive {
+            font-family: var(--font-mono); font-size: 10px;
+            color: var(--text-muted); letter-spacing: 1px; margin-top: -8px;
+        }
+
+        /* 애니메이션 최소화 선호 사용자 배려 */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
         /* ── RESPONSIVE MOBILE LAYOUT ── */
         @media (max-width: 850px) {
             header {
@@ -1178,6 +1277,7 @@
                             능력치 급등 — 국지 재해 상태 전환 중<br>
                             CENTER 진압 프로토콜로 이관
                         </div>
+                        <div class="suika-final-line">최종 흔적 TRACE &nbsp;<b id="suika-final-score">0</b></div>
                         <button class="hud-action-btn" style="max-width:220px;" onclick="bootSuikaGame()">시스템 재부팅</button>
                     </div>
                 </div>
@@ -1292,27 +1392,27 @@
                             <div>
                                 <div class="section-header">꽃 선택 <span class="count">TIER</span></div>
                                 <div style="margin-top:10px;">
-                                    <button class="flower-btn" onclick="selectFlowerType('Gypsophila','surface')">
+                                    <button class="flower-btn" onclick="selectFlowerType(event,'Gypsophila','surface')">
                                         GYPSOPHILA (안개꽃)
                                         <div class="flower-tier-hint" style="color:var(--color-garden);">▸ 표면 기밀 해제 // 정보 거래 의사 표현</div>
                                     </button>
-                                    <button class="flower-btn" onclick="selectFlowerType('Lily','surface')">
+                                    <button class="flower-btn" onclick="selectFlowerType(event,'Lily','surface')">
                                         WHITE LILY (백합)
                                         <div class="flower-tier-hint" style="color:var(--color-garden);">▸ 표면 기밀 해제 // 고인의 개인적 마지막 흔적</div>
                                     </button>
-                                    <button class="flower-btn" onclick="selectFlowerType('Black Rose','hidden')">
+                                    <button class="flower-btn" onclick="selectFlowerType(event,'Black Rose','hidden')">
                                         BLACK ROSE (흑장미)
                                         <div class="flower-tier-hint" style="color:var(--color-office);">▸ 심층 기밀 해제 // 조직 내 음모와 배신</div>
                                     </button>
-                                    <button class="flower-btn" onclick="selectFlowerType('Forget-Me-Not','hidden')">
+                                    <button class="flower-btn" onclick="selectFlowerType(event,'Forget-Me-Not','hidden')">
                                         FORGET-ME-NOT (물망초)
                                         <div class="flower-tier-hint" style="color:var(--color-office);">▸ 심층 기밀 해제 // 기억과 코스트에 새겨진 진실</div>
                                     </button>
-                                    <button class="flower-btn" onclick="selectFlowerType('Narcissus','deep')">
+                                    <button class="flower-btn" onclick="selectFlowerType(event,'Narcissus','deep')">
                                         NARCISSUS (수선화)
                                         <div class="flower-tier-hint" style="color:var(--color-center);">▸ 봉인 기밀 해제 // 마크와 2세대의 숨겨진 기원</div>
                                     </button>
-                                    <button class="flower-btn" onclick="selectFlowerType('Dried Wisteria','deep')">
+                                    <button class="flower-btn" onclick="selectFlowerType(event,'Dried Wisteria','deep')">
                                         DRIED WISTERIA (말린 등나무)
                                         <div class="flower-tier-hint" style="color:var(--color-center);">▸ 봉인 기밀 해제 // COVE 설립 이전의 금지된 기록</div>
                                     </button>
@@ -1398,7 +1498,8 @@
                         <div class="clinic-arena-label" id="clinic-arena-label">ANCHOR 동기화 프로토콜 // CLINIC UNDER</div>
                         <div class="pulse-core-ring-wrapper">
                             <div class="pulse-scanner"></div>
-                            <div class="pulse-target-zone" id="pulse-target-zone-el"></div>
+                            <div class="pulse-target-zone" id="pulse-zone-outer"></div>
+                            <div class="pulse-zone-inner" id="pulse-zone-inner"></div>
                             <div class="pulse-expanding-ring" id="clinic-pulse-ring"></div>
                             <div class="pulse-hit-flash" id="pulse-hit-flash"></div>
                             <div class="combo-flash-text" id="combo-flash-text">COMBO!</div>
@@ -1415,145 +1516,225 @@
 </div>
 
 <script>
-// ============================================================
-// BGM AUDIO SETUP
-// ============================================================
+/* ============================================================
+   COVE ARCHIVE TERMINAL v5.1
+   - 프레임레이트 독립 루프 / 스프라이트 캐시 / 루프 자동 정지
+   ============================================================ */
+'use strict';
+
+/* ── 0. 공통 유틸 ─────────────────────────────────────────── */
+const $   = id => document.getElementById(id);
+const TAU = Math.PI * 2;
+const wait  = ms => new Promise(r => setTimeout(r, ms));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+/** #rrggbb -> rgba(...) */
+function hexA(hex, a) {
+    const h = hex.replace('#', '');
+    const n = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
+    return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
+
+/* ── 1. 루프 매니저 ──────────────────────────────────────────
+   모든 requestAnimationFrame 루프를 한 곳에서 관리한다.
+   보이지 않는 탭의 루프는 완전히 정지 → 렉의 주 원인 제거.      */
+const Loops = (() => {
+    const reg = {};
+    return {
+        define(name, step) { reg[name] = { step, id: null, last: 0 }; },
+        start(name) {
+            const l = reg[name];
+            if (!l || l.id !== null) return;
+            l.last = performance.now();
+            const tick = t => {
+                l.id = requestAnimationFrame(tick);
+                const dt = Math.min(64, t - l.last); // 탭 복귀 시 점프 방지
+                l.last = t;
+                l.step(dt, t);
+            };
+            l.id = requestAnimationFrame(tick);
+        },
+        stop(name) {
+            const l = reg[name];
+            if (!l || l.id === null) return;
+            cancelAnimationFrame(l.id);
+            l.id = null;
+        },
+        running(name) { return !!reg[name] && reg[name].id !== null; }
+    };
+})();
+
+let pageVisible = !document.hidden;
+let currentTab  = 'mod-suika';
+
+function syncLoops() {
+    if (!pageVisible) {
+        Loops.stop('amb'); Loops.stop('suika'); Loops.stop('clinic');
+        return;
+    }
+    Loops.start('amb');
+
+    if (currentTab === 'mod-suika' && suikaReady && !sGameOver) Loops.start('suika');
+    else Loops.stop('suika');
+
+    if (currentTab === 'mod-clinic' && !clinicModalOpen) Loops.start('clinic');
+    else Loops.stop('clinic');
+}
+
+document.addEventListener('visibilitychange', () => {
+    pageVisible = !document.hidden;
+    syncLoops();
+    if (!pageVisible && !bgm.paused) bgm.pause();
+    else if (pageVisible && isBgmEnabled) playBgmForTab(currentTab);
+});
+
+/* ── 2. BGM ─────────────────────────────────────────────── */
 const bgm = new Audio();
 bgm.loop = true;
+bgm.preload = 'none';
 bgm.volume = 0.5;
 let isBgmEnabled = true;
 
 const audioFiles = {
-    'mod-suika': './MARK CONDENSATION.mp3',
-    'mod-sim': './INCIDENT RESPONSE.mp3',
-    'mod-test': './ORG APTITUDE.mp3',
-    'mod-garden': './GARDEN RITE.mp3',
-    'mod-clinic': './COST RELIEF SYNC.mp3'
+    'mod-suika':  'MARK CONDENSATION.mp3',
+    'mod-sim':    'INCIDENT RESPONSE.mp3',
+    'mod-test':   'ORG APTITUDE.mp3',
+    'mod-garden': 'GARDEN RITE.mp3',
+    'mod-clinic': 'COST RELIEF SYNC.mp3'
 };
+const bgmMissing = new Set();   // 없는 파일 재시도 방지
+
+bgm.addEventListener('error', () => {
+    if (bgm.currentSrc) bgmMissing.add(bgm.currentSrc);
+});
 
 function playBgmForTab(tabId) {
-    if (!isBgmEnabled) return;
-    if (audioFiles[tabId]) {
-        const newSrc = new URL(audioFiles[tabId], document.baseURI).href;
-        if (bgm.src !== newSrc) {
-            bgm.src = audioFiles[tabId];
-            bgm.play().catch(e => console.log("자동 재생 차단됨", e));
-        } else if (bgm.paused) {
-            bgm.play().catch(e => console.log("자동 재생 차단됨", e));
-        }
-    }
+    if (!isBgmEnabled || !pageVisible) return;
+    const file = audioFiles[tabId];
+    if (!file) return;
+    let abs = file;
+    try { abs = new URL(encodeURI(file), document.baseURI).href; } catch (_) { /* opaque base */ }
+    if (bgmMissing.has(abs)) return;
+    if (bgm.src !== abs) bgm.src = abs;
+    const p = bgm.play();
+    if (p && p.catch) p.catch(() => {});   // 자동재생 차단은 무시
 }
 
 function toggleBgm() {
-    const btn = document.getElementById('bgm-toggle');
+    const btn = $('bgm-toggle');
     if (isBgmEnabled) {
         bgm.pause();
         isBgmEnabled = false;
         btn.textContent = '🔈 OFF';
+        btn.setAttribute('aria-pressed', 'false');
     } else {
         isBgmEnabled = true;
         btn.textContent = '🔊 ON';
-        const activeTab = document.querySelector('.module-panel.active').id;
-        playBgmForTab(activeTab);
+        btn.setAttribute('aria-pressed', 'true');
+        playBgmForTab(currentTab);
     }
 }
 
-// 브라우저 자동재생 정책 대응
-document.body.addEventListener('click', function initBgm() {
-    if (bgm.paused && isBgmEnabled) {
-        const activeTab = document.querySelector('.module-panel.active').id;
-        playBgmForTab(activeTab);
-    }
-    document.body.removeEventListener('click', initBgm);
-}, { once: true });
-
-
-// ============================================================
-// UTILITIES
-// ============================================================
-const wait = ms => new Promise(r => setTimeout(r, ms));
-
-async function typeText(el, text, cls = "") {
-    const span = document.createElement("span");
-    if (cls) span.className = cls;
-    el.appendChild(span);
-    for (let i = 0; i < text.length; i++) {
-        span.textContent += text[i];
-        el.scrollTop = el.scrollHeight;
-        await wait(text[i] === '\n' ? 20 : 6);
-    }
+/* 볼륨 슬라이더 — 기존 코드에서 정의가 누락되어 오류가 나던 함수 */
+function changeVolume(v) {
+    const val = clamp(parseFloat(v), 0, 1);
+    if (!isNaN(val)) bgm.volume = val;
 }
 
-// ============================================================
-// CURSOR
-// ============================================================
-const customCursor = document.getElementById('custom-cursor');
+/* 브라우저 자동재생 정책 대응 (최초 1회 상호작용) */
+['click', 'keydown', 'touchend'].forEach(ev =>
+    document.addEventListener(ev, function unlockAudio() {
+        ['click', 'keydown', 'touchend'].forEach(e2 =>
+            document.removeEventListener(e2, unlockAudio));
+        if (isBgmEnabled) playBgmForTab(currentTab);
+    }, { once: true, passive: true })
+);
+
+/* ── 3. 커스텀 커서 (transform 기반 / rAF 스로틀) ──────────── */
+const customCursor = $('custom-cursor');
+let curX = -100, curY = -100, curScale = 1, curDirty = true;
+
 document.addEventListener('mousemove', e => {
-    customCursor.style.left = e.clientX + 'px';
-    customCursor.style.top  = e.clientY + 'px';
-});
-document.addEventListener('mousedown', () => customCursor.style.transform = 'translate(-50%,-50%) scale(0.75)');
-document.addEventListener('mouseup',   () => customCursor.style.transform = 'translate(-50%,-50%) scale(1)');
+    curX = e.clientX; curY = e.clientY; curDirty = true;
+}, { passive: true });
+document.addEventListener('mousedown', () => { curScale = 0.75; curDirty = true; }, { passive: true });
+document.addEventListener('mouseup',   () => { curScale = 1;    curDirty = true; }, { passive: true });
 
-// ============================================================
-// AMBIENT (RAIN + FOG)
-// ============================================================
-const ambCanvas = document.getElementById('ambient-canvas');
-const actx = ambCanvas.getContext('2d');
-let raindrops = [];
+function paintCursor() {
+    if (!curDirty) return;
+    curDirty = false;
+    customCursor.style.transform =
+        `translate3d(${curX}px, ${curY}px, 0) translate(-50%, -50%) scale(${curScale})`;
+}
 
+let cursorGlowTimer = null;
+function flashCursor(color, ms) {
+    customCursor.style.boxShadow = `0 0 25px ${color}`;
+    clearTimeout(cursorGlowTimer);
+    cursorGlowTimer = setTimeout(() => { customCursor.style.boxShadow = ''; }, ms);
+}
+
+/* ── 4. 앰비언트 레인 ────────────────────────────────────────
+   - 안개(정적 그라디언트)는 CSS로 이전 → 매 프레임 생성 제거
+   - 90회 stroke → 4회 stroke (불투명도 버킷)
+   - dt 기반 이동으로 고주사율 모니터에서도 동일 속도            */
+const ambCanvas = $('ambient-canvas');
+const actx = ambCanvas.getContext('2d', { alpha: true });
+const RAIN_BUCKETS = 4;
+let rainBuckets = [];
+
+function buildRain() {
+    const w = ambCanvas.width, h = ambCanvas.height;
+    const count = clamp(Math.round(w * h / 26000), 30, 90);
+    rainBuckets = Array.from({ length: RAIN_BUCKETS }, () => []);
+    for (let i = 0; i < count; i++) {
+        rainBuckets[i % RAIN_BUCKETS].push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            len: Math.random() * 22 + 12,
+            speed: Math.random() * 9 + 10
+        });
+    }
+}
+
+let resizeTimer = null;
 function resizeAmb() {
     ambCanvas.width  = window.innerWidth;
     ambCanvas.height = window.innerHeight;
+    buildRain();
 }
-window.addEventListener('resize', resizeAmb);
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resizeAmb, 150);
+});
 resizeAmb();
 
-for (let i = 0; i < 90; i++) {
-    raindrops.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        len: Math.random() * 22 + 12,
-        speed: Math.random() * 9 + 10,
-        opacity: Math.random() * 0.18 + 0.04,
-        // slight blue tint
-        r: 100 + Math.floor(Math.random()*40),
-        g: 140 + Math.floor(Math.random()*40),
-        b: 220 + Math.floor(Math.random()*35)
-    });
-}
-
-function animateAmb() {
-    actx.clearRect(0, 0, ambCanvas.width, ambCanvas.height);
-    // fog
-    const fog = actx.createRadialGradient(
-        ambCanvas.width/2, ambCanvas.height/2, 80,
-        ambCanvas.width/2, ambCanvas.height/2, ambCanvas.width * 0.9
-    );
-    fog.addColorStop(0, 'rgba(4,10,28,0)');
-    fog.addColorStop(1, 'rgba(2,5,18,0.3)');
-    actx.fillStyle = fog; actx.fillRect(0,0,ambCanvas.width,ambCanvas.height);
-
-    // rain
-    raindrops.forEach(d => {
-        actx.globalAlpha = d.opacity;
-        actx.strokeStyle = `rgba(${d.r},${d.g},${d.b},1)`;
-        actx.lineWidth = 0.8;
+Loops.define('amb', dt => {
+    paintCursor();
+    const f = dt / 16.667;
+    const w = ambCanvas.width, h = ambCanvas.height;
+    actx.clearRect(0, 0, w, h);
+    actx.strokeStyle = 'rgb(120,160,235)';
+    actx.lineWidth = 0.8;
+    for (let b = 0; b < RAIN_BUCKETS; b++) {
+        actx.globalAlpha = 0.05 + b * 0.05;
         actx.beginPath();
-        actx.moveTo(d.x, d.y);
-        actx.lineTo(d.x - 1.5, d.y + d.len);
+        const arr = rainBuckets[b];
+        for (let i = 0; i < arr.length; i++) {
+            const d = arr[i];
+            actx.moveTo(d.x, d.y);
+            actx.lineTo(d.x - 1.5, d.y + d.len);
+            d.y += d.speed * f;
+            d.x -= 0.8 * f;
+            if (d.y > h) { d.y = -d.len; d.x = Math.random() * w; }
+            if (d.x < -20) d.x = w + 20;
+        }
         actx.stroke();
-        d.y += d.speed; d.x -= 0.8;
-        if (d.y > ambCanvas.height) { d.y = -d.len; d.x = Math.random() * ambCanvas.width; }
-    });
+    }
     actx.globalAlpha = 1;
-    requestAnimationFrame(animateAmb);
-}
-animateAmb();
+});
 
-// ============================================================
-// LOADING BOOT SEQUENCE
-// ============================================================
+/* ── 5. 부팅 시퀀스 ──────────────────────────────────────── */
 const loadLogs = [
     "SYS_INIT: COVE 내부 인프라 연결 중...",
     "MARK_SCANNER: 국제 프로토콜로 스캔 초기화 중...",
@@ -1566,49 +1747,65 @@ const loadLogs = [
     "터미널 잠금 해제: 데이터 동기화 완료 — SYSTEM_READY."
 ];
 
-let logIdx = 0;
-const logBox  = document.getElementById('load-logs');
-const fillBar = document.getElementById('load-fill');
+(function bootSequence() {
+    let logIdx = 0;
+    const logBox  = $('load-logs');
+    const fillBar = $('load-fill');
+    let done = false;
 
-function printLog() {
-    if (logIdx < loadLogs.length) {
-        const d = document.createElement('div');
-        d.textContent = ">> " + loadLogs[logIdx];
-        logBox.appendChild(d);
-        const prev = logBox.children[logBox.children.length - 2];
-        if (prev) prev.classList.remove('active-log');
-        d.classList.add('active-log');
-        logBox.scrollTop = logBox.scrollHeight;
-        logIdx++;
-        fillBar.style.width = (logIdx / loadLogs.length * 100) + '%';
-        setTimeout(printLog, 220 + Math.random() * 140);
-    } else {
-        setTimeout(() => {
-            document.getElementById('loading-screen').style.opacity = '0';
-            document.getElementById('app-wrapper').style.opacity = '1';
-            setTimeout(() => document.getElementById('loading-screen').style.display = 'none', 1000);
-        }, 500);
+    function finish() {
+        if (done) return;
+        done = true;
+        const scr = $('loading-screen');
+        scr.style.opacity = '0';
+        $('app-wrapper').style.opacity = '1';
+        setTimeout(() => { scr.style.display = 'none'; }, 1000);
     }
-}
-setTimeout(printLog, 400);
 
-// ============================================================
-// TAB SWITCHING
-// ============================================================
+    function printLog() {
+        if (logIdx < loadLogs.length) {
+            const d = document.createElement('div');
+            d.textContent = '>> ' + loadLogs[logIdx];
+            const prev = logBox.lastElementChild;
+            if (prev) prev.classList.remove('active-log');
+            d.classList.add('active-log');
+            logBox.appendChild(d);
+            logBox.scrollTop = logBox.scrollHeight;
+            logIdx++;
+            fillBar.style.width = (logIdx / loadLogs.length * 100) + '%';
+            setTimeout(printLog, 200 + Math.random() * 130);
+        } else {
+            setTimeout(finish, 450);
+        }
+    }
+    setTimeout(printLog, 400);
+    setTimeout(finish, 9000);            // 안전장치: 무슨 일이 있어도 화면은 열린다
+    $('loading-screen').addEventListener('click', finish);
+})();
+
+/* ── 6. 탭 전환 ─────────────────────────────────────────── */
 function triggerTab(e, id) {
     document.querySelectorAll('.module-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-trigger').forEach(t => t.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    e.currentTarget.classList.add('active');
-    if (id === 'mod-suika' && !suikaRunning) bootSuikaGame();
-    
-    // 탭을 누를 때마다 배경음악 실행
+    document.querySelectorAll('.tab-trigger').forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+    });
+    const panel = $(id);
+    if (panel) panel.classList.add('active');
+    if (e && e.currentTarget) {
+        e.currentTarget.classList.add('active');
+        e.currentTarget.setAttribute('aria-selected', 'true');
+    }
+    currentTab = id;
+
+    if (id === 'mod-suika' && !suikaReady) bootSuikaGame();
+    syncLoops();
     playBgmForTab(id);
 }
 
-// ============================================================
-// MODULE 1: MARK CONDENSATION (SUIKA) - IMAGES FULLY INTEGRATED
-// ============================================================
+/* ============================================================
+   MODULE 1: MARK CONDENSATION (수박게임)
+   ============================================================ */
 const SUIKA_UNITS = [
     { id:1,  name:"SIGN",    r:16,  pts:1,  color:"#3a4a6b" },
     { id:2,  name:"HAZE",    r:23,  pts:3,  color:"#4a6090" },
@@ -1623,266 +1820,391 @@ const SUIKA_UNITS = [
     { id:11, name:"GASOLINE",r:130, pts:66, color:"#00e676" },
 ];
 
-let sEngine, sWorld, sRunner, sCanvas, sCtx;
+
+const BOARD_W = 440, BOARD_H = 640, DANGER_Y = 95, DROP_Y = 45;
+
+let sEngine = null, sWorld = null, sCanvas = null, sCtx = null;
 let sFruits = [], sScore = 0;
 let sCurLevel = 1, sNextLevel = 1;
 let sCanDrop = true, sGameOver = false;
-let suikaRunning = false, sGhostX = 220, sAnimId = null;
-let sUnlockedLevels = new Set([1, 2, 3]); // 초기 해금 등급
+let suikaReady = false, sGhostX = BOARD_W / 2;
+let sUnlockedLevels = new Set([1, 2, 3]);
+let physAcc = 0, lastTouchTs = 0;
+const FIXED_STEP = 1000 / 60;
 
-// 이미지 완벽 연동 구간
-const SUIKA_IMAGES = [];
-for (let i = 1; i <= 11; i++) {
+/* ── 이미지 로딩 (대소문자 경로 폴백 + 실패 시 등급 숫자 표시) ── */
+const SUIKA_IMAGES  = [];
+const spriteCache   = new Array(SUIKA_UNITS.length).fill(null);
+
+for (let i = 1; i <= SUIKA_UNITS.length; i++) {
+    const paths = [`A${i}.png`, `a${i}.png`, `A${i}.PNG`, `images/A${i}.png`];
     const img = new Image();
-    img.onload = () => {
-        if (sNextLevel === i) drawNextPreview(); 
+    img.decoding = 'async';
+    let attempt = 0;
+    img.onerror = () => {
+        attempt++;
+        if (attempt < paths.length) img.src = paths[attempt];
+        else { spriteCache[i - 1] = null; refreshMarkDBIcon(i); }
     };
-    img.src = `A${i}.png`; // 소문자 경로
+    img.onload = () => {
+        spriteCache[i - 1] = null;          // 캐시 무효화 → 다음 렌더에서 재생성
+        refreshMarkDBIcon(i);
+        if (sNextLevel === i) drawNextPreview();
+    };
+    img.src = paths[0];
     SUIKA_IMAGES.push(img);
 }
 
+const imgOk = img => !!img && img.complete && img.naturalWidth > 0;
+
+/* ── 스프라이트 캐시 ──────────────────────────────────────────
+   글로우 · 이미지 · 링을 매 프레임 다시 그리면(shadowBlur/clip)
+   캔버스가 급격히 느려진다. 등급별로 한 번만 그려 두고 재사용.  */
+function getSprite(lvl) {
+    const cached = spriteCache[lvl - 1];
+    if (cached) return cached;
+
+    const u = SUIKA_UNITS[lvl - 1];
+    const pad = 7;
+    const size = Math.ceil((u.r + pad) * 2);
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const g = c.getContext('2d');
+    const m = size / 2;
+
+    // 글로우 (shadowBlur 대신 그라디언트 — 훨씬 저렴)
+    const grad = g.createRadialGradient(m, m, u.r * 0.6, m, m, u.r + pad);
+    grad.addColorStop(0, hexA(u.color, 0.5));
+    grad.addColorStop(1, hexA(u.color, 0));
+    g.fillStyle = grad;
+    g.beginPath(); g.arc(m, m, u.r + pad, 0, TAU); g.fill();
+
+    // 본체
+    g.fillStyle = u.color;
+    g.beginPath(); g.arc(m, m, u.r, 0, TAU); g.fill();
+
+    // 이미지 (없으면 등급 숫자로 대체)
+    const img = SUIKA_IMAGES[lvl - 1];
+    if (imgOk(img)) {
+        g.save();
+        g.beginPath(); g.arc(m, m, u.r, 0, TAU); g.clip();
+        g.drawImage(img, m - u.r, m - u.r, u.r * 2, u.r * 2);
+        g.restore();
+    } else {
+        g.fillStyle = 'rgba(255,255,255,0.95)';
+        g.font = `900 ${Math.max(12, Math.round(u.r * 0.8))}px Orbitron, sans-serif`;
+        g.textAlign = 'center';
+        g.textBaseline = 'middle';
+        g.fillText(String(lvl), m, m + 1);
+    }
+
+    // 링
+    g.strokeStyle = 'rgba(255,255,255,0.9)';  g.lineWidth = 2.2;
+    g.beginPath(); g.arc(m, m, u.r - 1.1, 0, TAU); g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,0.28)'; g.lineWidth = 1;
+    g.beginPath(); g.arc(m, m, u.r * 0.65, 0, TAU); g.stroke();
+
+    spriteCache[lvl - 1] = c;
+    return c;
+}
+
+/* ── 마크 데이터베이스 (1회 생성 후 상태만 갱신) ─────────────── */
+const dbRows = [];
+
 function buildMarkDB() {
-    const list = document.getElementById('mark-db-list');
+    const list = $('mark-db-list');
     list.innerHTML = '';
+    dbRows.length = 0;
+
     SUIKA_UNITS.forEach(u => {
+        const row = document.createElement('div');
+        row.className = 'db-row-item';
+
+        const icon = document.createElement('canvas');
+        icon.width = icon.height = 22;
+        icon.className = 'db-circle-color';
+
+        const name = document.createElement('div');
+        name.className = 'db-name';
+
+        const pts = document.createElement('div');
+        pts.className = 'db-pts';
+
+        row.append(icon, name, pts);
+        list.appendChild(row);
+        dbRows.push({ u, row, icon, name, pts });
+    });
+    updateMarkDB();
+}
+
+function updateMarkDB() {
+    dbRows.forEach(({ u, row, icon, name, pts }) => {
         const unlocked = sUnlockedLevels.has(u.id);
-        const d = document.createElement('div');
-        d.className = 'db-row-item';
-        d.innerHTML = `
-            <div class="db-circle-color" style="
-                width: 18px; height: 18px;
-                background: ${unlocked ? `url('A${u.id}.png') center/cover no-repeat` : '#1a2030'}; 
-                border-color: ${unlocked ? u.color : '#2a3a50'};">
-            </div>
-            <div class="db-name" style="${unlocked ? '' : 'color:var(--text-muted);'}">${unlocked ? u.name : '???'}</div>
-            <div class="db-pts">${unlocked ? '+'+u.pts+'P' : '--'}</div>
-        `;
-        list.appendChild(d);
+        row.classList.toggle('locked', !unlocked);
+        name.textContent = unlocked ? u.name : '???';
+        pts.textContent  = unlocked ? '+' + u.pts + 'P' : '--';
+        icon.style.borderColor = unlocked ? u.color : '#2a3a50';
+        const g = icon.getContext('2d');
+        g.clearRect(0, 0, 22, 22);
+        if (unlocked) {
+            g.drawImage(getSprite(u.id), 0, 0, 22, 22);
+        } else {
+            g.fillStyle = '#1a2030';
+            g.beginPath(); g.arc(11, 11, 11, 0, TAU); g.fill();
+        }
     });
 }
 
+function refreshMarkDBIcon(lvl) {
+    if (dbRows.length && sUnlockedLevels.has(lvl)) updateMarkDB();
+}
+
+function unlockLevel(lvl) {
+    if (sUnlockedLevels.has(lvl)) return;
+    sUnlockedLevels.add(lvl);
+    updateMarkDB();
+}
+
+/* ── 좌표 변환 / 입력 (리스너는 최초 1회만 등록) ─────────────── */
+function getCanvasX(clientX) {
+    const r = sCanvas.getBoundingClientRect();
+    return (clientX - r.left) * (BOARD_W / r.width);
+}
+
+function randSpawnLevel() {
+    const roll = Math.random();
+    return roll < 0.4 ? 1 : roll < 0.75 ? 2 : 3;
+}
+
+function dropMark(clientX) {
+    if (!sCanDrop || sGameOver || !sEngine) return;
+    sCanDrop = false;
+
+    const rad = SUIKA_UNITS[sCurLevel - 1].r;
+    const cx  = clamp(getCanvasX(clientX), rad + 4, BOARD_W - rad - 4);
+
+    const mark = Matter.Bodies.circle(cx, DROP_Y, rad, {
+        label: 'mark', restitution: 0.15, friction: 0.4, frictionStatic: 0.5
+    });
+    mark.gameLvl = sCurLevel;
+    mark.isMerged = false;
+    mark.spawnTime = performance.now();
+    mark.calmSince = 0;
+
+    Matter.Composite.add(sWorld, mark);
+    sFruits.push(mark);
+    unlockLevel(sCurLevel);
+
+    sCurLevel  = sNextLevel;
+    sNextLevel = randSpawnLevel();
+    drawNextPreview();
+    setTimeout(() => { sCanDrop = true; }, 420);
+}
+
+let suikaInputBound = false;
+function bindSuikaInput() {
+    if (suikaInputBound) return;
+    suikaInputBound = true;
+
+    sCanvas.addEventListener('mousemove', e => { sGhostX = getCanvasX(e.clientX); }, { passive: true });
+
+    sCanvas.addEventListener('touchmove', e => {
+        if (!e.touches.length) return;
+        e.preventDefault();
+        sGhostX = getCanvasX(e.touches[0].clientX);
+    }, { passive: false });
+
+    sCanvas.addEventListener('touchend', e => {
+        if (!e.changedTouches.length) return;
+        lastTouchTs = performance.now();
+        sGhostX = getCanvasX(e.changedTouches[0].clientX);
+        dropMark(e.changedTouches[0].clientX);
+    });
+
+    // 터치 후 브라우저가 합성하는 click 중복 방지
+    sCanvas.addEventListener('click', e => {
+        if (performance.now() - lastTouchTs < 900) return;
+        dropMark(e.clientX);
+    });
+}
+
+/* ── 게임 시작 / 재시작 ─────────────────────────────────────── */
 function bootSuikaGame() {
-    suikaRunning = true;
-    buildMarkDB();
-    document.getElementById('suika-go-panel').style.display = 'none';
-    sCanvas = document.getElementById('suika-canvas');
+    sCanvas = $('suika-canvas');
     sCtx = sCanvas.getContext('2d');
-    sScore = 0; sGameOver = false; sFruits = []; sCanDrop = true;
+
+    if (typeof Matter === 'undefined') {
+        sCtx.fillStyle = '#04070f';
+        sCtx.fillRect(0, 0, BOARD_W, BOARD_H);
+        sCtx.fillStyle = '#ff5252';
+        sCtx.font = '13px monospace';
+        sCtx.textAlign = 'center';
+        sCtx.fillText('물리 엔진(matter.js) 로드 실패 —', BOARD_W / 2, BOARD_H / 2 - 12);
+        sCtx.fillText('네트워크 연결 확인 후 새로고침하세요.', BOARD_W / 2, BOARD_H / 2 + 12);
+        return;
+    }
+
+    // 이전 세션 정리
+    Loops.stop('suika');
+    if (sEngine) {
+        Matter.Events.off(sEngine);
+        Matter.Composite.clear(sWorld, false);
+        Matter.Engine.clear(sEngine);
+    }
+
+    sScore = 0; sGameOver = false; sFruits = []; sCanDrop = true; physAcc = 0;
     sUnlockedLevels = new Set([1, 2, 3]);
-    document.getElementById('suika-current-score').textContent = 0;
+    $('suika-current-score').textContent = '0';
+    $('suika-go-panel').style.display = 'none';
 
-    if (sAnimId) cancelAnimationFrame(sAnimId);
-    if (sEngine) { Matter.Runner.stop(sRunner); Matter.World.clear(sWorld); Matter.Engine.clear(sEngine); }
+    sEngine = Matter.Engine.create();
+    sEngine.gravity.y = 1.4;
+    sEngine.positionIterations = 6;
+    sEngine.velocityIterations = 4;
+    sWorld = sEngine.world;
 
-    sEngine = Matter.Engine.create({ gravity: { x:0, y:1.4 } });
-    sWorld  = sEngine.world;
-
-    const wOpts = { isStatic:true, friction:0.2, render:{visible:false} };
-    Matter.World.add(sWorld, [
-        Matter.Bodies.rectangle(220, 650, 440, 20, wOpts),
-        Matter.Bodies.rectangle(-10, 320, 20, 640, wOpts),
-        Matter.Bodies.rectangle(450, 320, 20, 640, wOpts)
+    const wOpts = { isStatic: true, friction: 0.25, restitution: 0 };
+    Matter.Composite.add(sWorld, [
+        Matter.Bodies.rectangle(BOARD_W / 2, BOARD_H + 10, BOARD_W, 20, wOpts),
+        Matter.Bodies.rectangle(-10, BOARD_H / 2, 20, BOARD_H * 2, wOpts),
+        Matter.Bodies.rectangle(BOARD_W + 10, BOARD_H / 2, 20, BOARD_H * 2, wOpts)
     ]);
 
     Matter.Events.on(sEngine, 'collisionStart', evt => {
         if (sGameOver) return;
-        evt.pairs.forEach(pair => {
-            const a = pair.bodyA, b = pair.bodyB;
-            if (a.label==='mark' && b.label==='mark' && a.gameLvl===b.gameLvl && a.gameLvl<11 && !a.isMerged && !b.isMerged) {
+        const pairs = evt.pairs;
+        for (let i = 0; i < pairs.length; i++) {
+            const a = pairs[i].bodyA, b = pairs[i].bodyB;
+            if (a.label === 'mark' && b.label === 'mark' &&
+                a.gameLvl === b.gameLvl && a.gameLvl < SUIKA_UNITS.length &&
+                !a.isMerged && !b.isMerged) {
                 a.isMerged = b.isMerged = true;
                 doMerge(a, b);
             }
-        });
+        }
     });
 
-    sRunner = Matter.Runner.create();
-    Matter.Runner.run(sRunner, sEngine);
-
-    sCurLevel  = Math.ceil(Math.random() * 3);
-    sNextLevel = Math.ceil(Math.random() * 3);
+    sCurLevel  = randSpawnLevel();
+    sNextLevel = randSpawnLevel();
+    buildMarkDB();
     drawNextPreview();
+    bindSuikaInput();
 
-    // Responsive Canvas Coordinate Mapping
-    function getCanvasX(clientX) {
-        const r = sCanvas.getBoundingClientRect();
-        const scaleX = sCanvas.width / r.width;
-        return (clientX - r.left) * scaleX;
-    }
-
-    // Mouse Events
-    sCanvas.onmousemove = e => { sGhostX = getCanvasX(e.clientX); };
-    
-    // Touch Events for Mobile
-    sCanvas.addEventListener('touchmove', e => {
-        if (e.touches.length > 0) {
-            e.preventDefault(); // Prevents page scrolling while dragging
-            sGhostX = getCanvasX(e.touches[0].clientX);
-        }
-    }, { passive: false });
-
-    function dropFruit(clientX) {
-        if (!sCanDrop || sGameOver) return;
-        sCanDrop = false;
-        let cx = getCanvasX(clientX);
-        const rad = SUIKA_UNITS[sCurLevel-1].r;
-        cx = Math.max(rad+4, Math.min(440-rad-4, cx));
-
-        const mark = Matter.Bodies.circle(cx, 45, rad, { label:'mark', restitution:0.15, friction:0.4 });
-        mark.gameLvl = sCurLevel; mark.isMerged = false; mark.settledTime = Date.now();
-        Matter.World.add(sWorld, mark); sFruits.push(mark);
-
-        sCurLevel  = sNextLevel;
-        sNextLevel = Math.ceil(Math.random() * 4);
-        drawNextPreview();
-        setTimeout(() => { sCanDrop = true; }, 500);
-    }
-
-    sCanvas.onclick = e => { dropFruit(e.clientX); };
-    sCanvas.addEventListener('touchend', e => {
-        if (e.changedTouches.length > 0) {
-            dropFruit(e.changedTouches[0].clientX);
-        }
-    });
-
-    sAnimId = requestAnimationFrame(renderSuika);
+    suikaReady = true;
+    syncLoops();
 }
 
 function doMerge(a, b) {
-    const mx = (a.position.x + b.position.x)/2;
-    const my = (a.position.y + b.position.y)/2;
+    const mx = (a.position.x + b.position.x) / 2;
+    const my = (a.position.y + b.position.y) / 2;
     const lvl = a.gameLvl + 1;
-    Matter.World.remove(sWorld, [a, b]);
-    sFruits = sFruits.filter(f => f!==a && f!==b);
-    sScore += SUIKA_UNITS[lvl-1].pts;
-    document.getElementById('suika-current-score').textContent = sScore;
-    const m = Matter.Bodies.circle(mx, my, SUIKA_UNITS[lvl-1].r, { label:'mark', restitution:0.18, friction:0.4 });
-    m.gameLvl = lvl; m.isMerged = false; m.settledTime = Date.now();
-    sUnlockedLevels.add(lvl); // 합성으로 해금
-    Matter.World.add(sWorld, m); sFruits.push(m);
-    buildMarkDB(); // DB 목록 갱신
+
+    Matter.Composite.remove(sWorld, [a, b]);
+    sFruits = sFruits.filter(f => f !== a && f !== b);
+
+    sScore += SUIKA_UNITS[lvl - 1].pts;
+    $('suika-current-score').textContent = sScore;
+
+    const m = Matter.Bodies.circle(mx, my, SUIKA_UNITS[lvl - 1].r, {
+        label: 'mark', restitution: 0.18, friction: 0.4, frictionStatic: 0.5
+    });
+    m.gameLvl = lvl;
+    m.isMerged = false;
+    m.spawnTime = performance.now();
+    m.calmSince = 0;
+    Matter.Composite.add(sWorld, m);
+    sFruits.push(m);
+
+    unlockLevel(lvl);
 }
 
 function drawNextPreview() {
-    const nc = document.getElementById('suika-next-canvas');
+    const nc = $('suika-next-canvas');
+    if (!nc) return;
     const nx = nc.getContext('2d');
-    nx.clearRect(0,0,60,60);
-    const u = SUIKA_UNITS[sNextLevel-1];
-    
-    // 배경색 채우기
-    nx.shadowBlur = 14; nx.shadowColor = u.color;
-    nx.fillStyle = u.color;
-    nx.beginPath(); nx.arc(30,30,18,0,Math.PI*2); nx.fill();
-    nx.shadowBlur = 0;
-
-    // 이미지 그리기
-    nx.save();
-    nx.beginPath(); nx.arc(30,30,18,0,Math.PI*2); nx.clip();
-    const nImg = SUIKA_IMAGES[sNextLevel-1];
-    if (nImg && nImg.complete && nImg.naturalWidth !== 0) {
-        nx.drawImage(nImg, 30-18, 30-18, 36, 36);
-    }
-    nx.restore();
-
-    // 테두리
-    nx.strokeStyle = 'rgba(255,255,255,0.5)'; nx.lineWidth = 1;
-    nx.beginPath(); nx.arc(30,30,18,0,Math.PI*2); nx.stroke();
-    
-    // (텍스트 렌더링 코드 제거됨)
+    nx.clearRect(0, 0, 60, 60);
+    nx.drawImage(getSprite(sNextLevel), 6, 6, 48, 48);
 }
 
-function renderSuika() {
-    if (sGameOver) return;
-    sCtx.clearRect(0,0,440,640);
+/* ── 렌더 + 물리 (고정 스텝, 단일 rAF) ─────────────────────── */
+Loops.define('suika', dt => {
+    if (!sEngine || sGameOver) return;
 
-    // danger line
-    sCtx.strokeStyle = 'rgba(255,82,82,0.35)';
-    sCtx.lineWidth = 1; sCtx.setLineDash([5,5]);
-    sCtx.beginPath(); sCtx.moveTo(0,95); sCtx.lineTo(440,95); sCtx.stroke();
-    sCtx.setLineDash([]);
+    // 1) 물리: 고정 타임스텝 → 주사율과 무관하게 동일한 낙하감
+    physAcc += dt;
+    let steps = 0;
+    while (physAcc >= FIXED_STEP && steps < 5) {
+        Matter.Engine.update(sEngine, FIXED_STEP);
+        physAcc -= FIXED_STEP;
+        steps++;
+    }
+    if (physAcc > FIXED_STEP * 5) physAcc = 0;
 
-    // drop guide (현재 들고 있는 과일 투명하게 그리기)
-    if (sCanDrop && !sGameOver) {
-        const rad = SUIKA_UNITS[sCurLevel-1].r;
-        const tx = Math.max(rad+4, Math.min(440-rad-4, sGhostX));
-        sCtx.strokeStyle = 'rgba(0,229,255,0.08)';
-        sCtx.setLineDash([3,5]);
-        sCtx.beginPath(); sCtx.moveTo(tx,45); sCtx.lineTo(tx,640); sCtx.stroke();
-        sCtx.setLineDash([]);
-        
-        const u = SUIKA_UNITS[sCurLevel-1];
-        sCtx.shadowBlur = 10; sCtx.shadowColor = u.color;
-        sCtx.fillStyle = u.color; sCtx.globalAlpha = 0.4;
-        sCtx.beginPath(); sCtx.arc(tx,45,rad,0,Math.PI*2); sCtx.fill();
-        sCtx.shadowBlur = 0;
+    // 2) 렌더
+    const ctx = sCtx;
+    ctx.clearRect(0, 0, BOARD_W, BOARD_H);
 
-        // 투명 이미지 그리기 (해금 여부와 무관하게 표시)
-        sCtx.save();
-        sCtx.globalAlpha = 0.4;
-        sCtx.beginPath(); sCtx.arc(tx,45,rad,0,Math.PI*2); sCtx.clip();
-        const gImg = SUIKA_IMAGES[sCurLevel-1];
-        if (gImg && gImg.complete && gImg.naturalWidth !== 0) {
-            sCtx.drawImage(gImg, tx-rad, 45-rad, rad*2, rad*2);
-        }
-        sCtx.restore();
-        sCtx.globalAlpha = 1;
+    ctx.strokeStyle = 'rgba(255,82,82,0.35)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath(); ctx.moveTo(0, DANGER_Y); ctx.lineTo(BOARD_W, DANGER_Y); ctx.stroke();
+    ctx.setLineDash([]);
+
+    if (sCanDrop) {
+        const rad = SUIKA_UNITS[sCurLevel - 1].r;
+        const tx = clamp(sGhostX, rad + 4, BOARD_W - rad - 4);
+        ctx.strokeStyle = 'rgba(0,229,255,0.10)';
+        ctx.setLineDash([3, 5]);
+        ctx.beginPath(); ctx.moveTo(tx, DROP_Y); ctx.lineTo(tx, BOARD_H); ctx.stroke();
+        ctx.setLineDash([]);
+
+        const sp = getSprite(sCurLevel);
+        ctx.globalAlpha = 0.45;
+        ctx.drawImage(sp, tx - sp.width / 2, DROP_Y - sp.height / 2);
+        ctx.globalAlpha = 1;
     }
 
+    const now = performance.now();
     let rampage = false;
-    const now = Date.now();
-    sFruits.forEach(f => {
-        const u = SUIKA_UNITS[f.gameLvl-1];
-        sCtx.save();
-        sCtx.translate(f.position.x, f.position.y);
-        sCtx.rotate(f.angle);
-        
-        // glow 배경
-        sCtx.shadowBlur = 12; sCtx.shadowColor = u.color;
-        sCtx.fillStyle = u.color;
-        sCtx.beginPath(); sCtx.arc(0,0,u.r,0,Math.PI*2); sCtx.fill();
-        sCtx.shadowBlur = 0;
 
-        // 이미지 그리기 (해금 여부와 무관하게 100% 온전하게 표시)
-        sCtx.save();
-        sCtx.beginPath(); sCtx.arc(0,0,u.r,0,Math.PI*2); sCtx.clip();
-        const cImg = SUIKA_IMAGES[f.gameLvl-1];
-        if (cImg && cImg.complete && cImg.naturalWidth !== 0) {
-            sCtx.drawImage(cImg, -u.r, -u.r, u.r*2, u.r*2);
+    for (let i = 0; i < sFruits.length; i++) {
+        const f = sFruits[i];
+        const u = SUIKA_UNITS[f.gameLvl - 1];
+        const sp = getSprite(f.gameLvl);
+
+        ctx.save();
+        ctx.translate(f.position.x, f.position.y);
+        ctx.rotate(f.angle);
+        ctx.drawImage(sp, -sp.width / 2, -sp.height / 2);
+        ctx.restore();
+
+        // 정지 판정 — 실제로 멈춘 시점부터 계산 (기존: 생성 시점 기준 오판정)
+        const v = f.velocity;
+        if (Math.abs(v.y) < 0.25 && Math.abs(v.x) < 0.25) {
+            if (!f.calmSince) f.calmSince = now;
+        } else {
+            f.calmSince = 0;
         }
-        sCtx.restore();
 
-        // 아우터 라인
-        sCtx.strokeStyle = 'rgba(255,255,255,0.92)'; sCtx.lineWidth = 2.2;
-        sCtx.beginPath(); sCtx.arc(0,0,u.r,0,Math.PI*2); sCtx.stroke();
-        
-        // 이너 라인
-        sCtx.strokeStyle = 'rgba(255,255,255,0.3)'; sCtx.lineWidth = 1;
-        sCtx.beginPath(); sCtx.arc(0,0,u.r*0.65,0,Math.PI*2); sCtx.stroke();
-        
-        // (텍스트 렌더링 코드 제거됨)
-
-        sCtx.restore();
-
-        if (f.position.y - u.r < 95 && now - f.settledTime > 1500 && Math.abs(f.velocity.y) < 0.15) rampage = true;
-    });
-
-    if (rampage) {
-        sGameOver = true;
-        document.getElementById('suika-go-panel').style.display = 'flex';
-    } else {
-        sAnimId = requestAnimationFrame(renderSuika);
+        if (f.position.y - u.r < DANGER_Y &&
+            f.calmSince && now - f.calmSince > 1200 &&
+            now - f.spawnTime > 900) rampage = true;
     }
-}
 
-window.addEventListener('load', () => {
-    updateCostBar();
-    if (document.getElementById('mod-suika').classList.contains('active')) bootSuikaGame();
+    if (rampage) endSuikaGame();
 });
 
-// ============================================================
-// MODULE 2: INCIDENT RESPONSE SIMULATOR
-// ============================================================
-let globalCost = 40;
+function endSuikaGame() {
+    sGameOver = true;
+    Loops.stop('suika');
+    $('suika-go-panel').style.display = 'flex';
+    const gs = $('suika-final-score');
+    if (gs) gs.textContent = sScore;
+}
 
+/* ============================================================
+   MODULE 2: INCIDENT RESPONSE SIMULATOR
+   ============================================================ */
 const SCENARIOS = [
     {
         title: "[구역: 저층] 2세대 집단 폭주 — 조선소 고철지대",
@@ -1942,63 +2264,121 @@ const SCENARIOS = [
     }
 ];
 
+
+let globalCost = 40;
+
 function updateCostBar() {
-    const fill = document.getElementById('sim-cost-fill-bar');
-    const text = document.getElementById('sim-cost-display-text');
-    const gfill = document.getElementById('global-cost-fill');
-    fill.style.width = globalCost + '%';
-    gfill.style.width = globalCost + '%';
-    text.textContent = globalCost + '%';
-    if (globalCost >= 85) {
-        fill.style.background = 'var(--color-center)'; fill.style.boxShadow = '0 0 10px var(--color-center)';
-        gfill.style.background = 'var(--color-center)'; gfill.style.boxShadow = '0 0 8px var(--color-center)';
-    } else if (globalCost >= 60) {
-        fill.style.background = 'var(--color-office)'; fill.style.boxShadow = '0 0 10px var(--color-office)';
-        gfill.style.background = 'var(--color-office)'; gfill.style.boxShadow = '0 0 8px var(--color-office)';
-    } else {
-        fill.style.background = 'var(--color-clinic)'; fill.style.boxShadow = '0 0 10px var(--color-clinic)';
-        gfill.style.background = 'var(--color-clinic)'; gfill.style.boxShadow = '0 0 8px var(--color-clinic)';
+    const fill  = $('sim-cost-fill-bar');
+    const text  = $('sim-cost-display-text');
+    const gfill = $('global-cost-fill');
+    const color = globalCost >= 85 ? 'var(--color-center)'
+                : globalCost >= 60 ? 'var(--color-office)'
+                : 'var(--color-clinic)';
+    const glow  = globalCost >= 85 ? 'rgba(255,82,82,0.6)'
+                : globalCost >= 60 ? 'rgba(240,180,41,0.6)'
+                : 'rgba(0,229,255,0.6)';
+
+    if (fill) {
+        fill.style.width = globalCost + '%';
+        fill.style.background = color;
+        fill.style.boxShadow = `0 0 10px ${glow}`;
     }
+    if (gfill) {
+        gfill.style.width = globalCost + '%';
+        gfill.style.background = color;
+        gfill.style.boxShadow = `0 0 8px ${glow}`;
+    }
+    if (text) text.textContent = globalCost + '%';
+}
+
+/* ── 타이핑 출력 ─────────────────────────────────────────────
+   기존: 글자마다 await + scrollTop 접근 → 글자 수만큼 리플로우.
+   변경: 프레임당 여러 글자 + 프레임당 스크롤 1회 (최대 ~90프레임)  */
+let typeToken = 0;
+let skipTyping = false;
+
+function typeText(el, text, cls = '') {
+    const span = document.createElement('span');
+    if (cls) span.className = cls;
+    el.appendChild(span);
+
+    const myToken = typeToken;
+    return new Promise(resolve => {
+        let i = 0;
+        const per = Math.max(1, Math.ceil(text.length / 80));
+        const step = () => {
+            if (myToken !== typeToken) { resolve(); return; }
+            if (skipTyping) {
+                span.textContent = text;
+                el.scrollTop = el.scrollHeight;
+                resolve(); return;
+            }
+            i = Math.min(text.length, i + per);
+            span.textContent = text.slice(0, i);
+            el.scrollTop = el.scrollHeight;
+            if (i >= text.length) { resolve(); return; }
+            requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+    });
 }
 
 let activeScenario = null;
+let lastScenarioIdx = -1;
 
 async function initiateScenarioDispatch() {
-    const out   = document.getElementById('sim-terminal-output');
-    const choices = document.getElementById('sim-choice-container');
-    out.innerHTML = ''; choices.innerHTML = '';
+    const out     = $('sim-terminal-output');
+    const choices = $('sim-choice-container');
 
-    activeScenario = SCENARIOS[Math.floor(Math.random() * SCENARIOS.length)];
+    const myToken = ++typeToken;        // 진행 중이던 출력은 즉시 중단
+    skipTyping = false;
+    out.innerHTML = '';
+    choices.innerHTML = '';
 
-    await typeText(out, `[SYSTEM LOG] ═══════════════════════════════════\n`, "sys-msg");
-    await typeText(out, `[긴급] COVE 내 비상 사건 등록됨\n`, "alert-msg");
-    await typeText(out, `[SYSTEM LOG] ═══════════════════════════════════\n\n`, "sys-msg");
-    await typeText(out, `INCIDENT ID : ${activeScenario.title}\n\n`, "heal-msg");
-    await typeText(out, `현장 보고 :\n${activeScenario.situation}\n\n`);
-    await typeText(out, `[선택 요청] : ${activeScenario.query}\n`, "sys-msg");
+    // 같은 시나리오 연속 방지
+    let idx = Math.floor(Math.random() * SCENARIOS.length);
+    if (SCENARIOS.length > 1 && idx === lastScenarioIdx) idx = (idx + 1) % SCENARIOS.length;
+    lastScenarioIdx = idx;
+    activeScenario = SCENARIOS[idx];
+
+    const guard = () => myToken === typeToken;
+
+    await typeText(out, `[SYSTEM LOG] ═══════════════════════════════════\n`, 'sys-msg');   if (!guard()) return;
+    await typeText(out, `[긴급] COVE 내 비상 사건 등록됨\n`, 'alert-msg');                    if (!guard()) return;
+    await typeText(out, `[SYSTEM LOG] ═══════════════════════════════════\n\n`, 'sys-msg');  if (!guard()) return;
+    await typeText(out, `INCIDENT ID : ${activeScenario.title}\n\n`, 'heal-msg');            if (!guard()) return;
+    await typeText(out, `현장 보고 :\n${activeScenario.situation}\n\n`);                     if (!guard()) return;
+    await typeText(out, `[선택 요청] : ${activeScenario.query}\n`, 'sys-msg');               if (!guard()) return;
 
     buildChoices();
 }
 
+function isBranchLocked(b, org, role) {
+    if (b.reqOrg  && b.reqOrg !== 'ANY' && b.reqOrg !== org)  return true;
+    if (b.reqRole && b.reqRole !== role)                      return true;
+    return false;
+}
+
 function buildChoices() {
-    const cc = document.getElementById('sim-choice-container');
+    const cc = $('sim-choice-container');
     cc.innerHTML = '';
-    const org  = document.getElementById('sim-input-org').value;
-    const role = document.getElementById('sim-input-role').value;
+    if (!activeScenario) return;
+
+    const org  = $('sim-input-org').value;
+    const role = $('sim-input-role').value;
 
     activeScenario.branches.forEach(b => {
         const btn = document.createElement('button');
         btn.className = 'interactive-choice-btn';
-        let locked = false;
-        if (b.reqOrg && b.reqOrg !== 'ANY' && b.reqOrg !== org) locked = true;
-        if (b.reqRole && b.reqRole !== role) {
-            if (b.reqOrg && b.reqOrg === org) locked = false;
-            else if (b.reqOrg && b.reqOrg !== 'ANY') locked = true;
-            else locked = true;
-        }
-        if (locked) {
+        btn.type = 'button';
+
+        if (isBranchLocked(b, org, role)) {
+            const need = [];
+            if (b.reqOrg && b.reqOrg !== 'ANY') need.push(b.reqOrg);
+            if (b.reqRole) need.push(b.reqRole);
             btn.classList.add('disabled-node');
-            btn.textContent = `🔒 [접근 불가] ${b.text.split(']')[1] || b.text}`;
+            btn.disabled = true;
+            btn.textContent = `🔒 [접근 불가 — ${need.join(' / ')} 자격 필요] ${b.text.replace(/^\[[^\]]*\]\s*/, '')}`;
         } else {
             btn.textContent = b.text;
             btn.onclick = () => resolveChoice(b);
@@ -2007,35 +2387,62 @@ function buildChoices() {
     });
 }
 
+/* 프로필을 바꾸면 선택지 잠금 상태를 즉시 갱신 */
+['sim-input-org', 'sim-input-role', 'sim-input-rank'].forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('change', () => {
+        if (activeScenario && $('sim-choice-container').querySelector('.interactive-choice-btn')) buildChoices();
+    });
+});
+
+/* 터미널 클릭 시 타이핑 즉시 완료 */
+(function bindSkip() {
+    const out = $('sim-terminal-output');
+    if (out) out.addEventListener('click', () => { skipTyping = true; });
+})();
+
 async function resolveChoice(b) {
-    const out = document.getElementById('sim-terminal-output');
-    document.getElementById('sim-choice-container').innerHTML = '';
-    await typeText(out, `\n>> 전술 선택 확정.\n`, "sys-msg");
-    await wait(500);
-    await typeText(out, `[결과] :\n${b.outcome}\n\n`, "heal-msg");
-    globalCost = Math.min(100, Math.max(0, globalCost + b.costDelta));
+    const out = $('sim-terminal-output');
+    const cc  = $('sim-choice-container');
+    cc.innerHTML = '';
+
+    const myToken = ++typeToken;
+    skipTyping = false;
+    const guard = () => myToken === typeToken;
+
+    await typeText(out, `\n>> 전술 선택 확정.\n`, 'sys-msg');            if (!guard()) return;
+    await wait(400);                                                     if (!guard()) return;
+    await typeText(out, `[결과] :\n${b.outcome}\n\n`, 'heal-msg');       if (!guard()) return;
+
+    globalCost = clamp(globalCost + b.costDelta, 0, 100);
     updateCostBar();
 
-    const cc = document.getElementById('sim-choice-container');
     if (globalCost >= 100) {
-        await typeText(out, `[치명] 에이전트 코스트 임계치 초과 (100%).\n자기 보존 기능 정지 임박.\n피부 표면의 마크 흔적 발화 중 — 강제 격리 유닛 출동.\n`, "alert-msg");
+        await typeText(out,
+            `[치명] 에이전트 코스트 임계치 초과 (100%).\n자기 보존 기능 정지 임박.\n피부 표면의 마크 흔적 발화 중 — 강제 격리 유닛 출동.\n`,
+            'alert-msg');
+        if (!guard()) return;
         const btn = document.createElement('button');
-        btn.className = 'hud-action-btn'; btn.style.maxWidth = '320px';
+        btn.className = 'hud-action-btn';
+        btn.type = 'button';
+        btn.style.maxWidth = '320px';
         btn.textContent = 'CLINIC 긴급 회복 프로토콜';
         btn.onclick = () => { globalCost = 30; updateCostBar(); initiateScenarioDispatch(); };
         cc.appendChild(btn);
     } else {
         const btn = document.createElement('button');
-        btn.className = 'hud-action-btn'; btn.style.maxWidth = '220px';
+        btn.className = 'hud-action-btn';
+        btn.type = 'button';
+        btn.style.maxWidth = '220px';
         btn.textContent = '▶ 다음 대기 상태';
-        btn.onclick = initiateScenarioDispatch;
+        btn.onclick = () => initiateScenarioDispatch();
         cc.appendChild(btn);
     }
 }
 
-// ============================================================
-// MODULE 3: ORGANIZATION APTITUDE
-// ============================================================
+/* ============================================================
+   MODULE 3: ORGANIZATION APTITUDE
+   ============================================================ */
 const QUESTIONS = [
     {
         q: "저층 슬럼가의 깊은 배수로에서, 극도의 고착 거부 반응으로 폭주 직전에 몰린 2세대 유아 감염자를 발견했다. 당신의 대응 원칙은?",
@@ -2066,40 +2473,61 @@ const QUESTIONS = [
     }
 ];
 
-let qIdx = 0, aptScores = { CENTER:0, OFFICE:0, CLINIC:0, GARDEN:0 };
+
+let qIdx = 0;
+let aptScores = { CENTER: 0, OFFICE: 0, CLINIC: 0, GARDEN: 0 };
 
 function startAptitudeTest() {
-    document.getElementById('test-intro-box').style.display = 'none';
-    qIdx = 0; aptScores = { CENTER:0, OFFICE:0, CLINIC:0, GARDEN:0 };
+    $('test-intro-box').style.display = 'none';
+    $('test-result-dossier').style.display = 'none';
+    qIdx = 0;
+    aptScores = { CENTER: 0, OFFICE: 0, CLINIC: 0, GARDEN: 0 };
     renderQuestion();
 }
 
 function renderQuestion() {
-    const area = document.getElementById('test-qa-area');
+    const area = $('test-qa-area');
     area.innerHTML = '';
     if (qIdx >= QUESTIONS.length) { showResult(); return; }
 
     const q = QUESTIONS[qIdx];
+    const pad = n => String(n).padStart(2, '0');
+
     const card = document.createElement('div');
     card.className = 'aptitude-card active';
-    card.innerHTML = `
-        <div style="font-family:var(--font-mono); font-size:10px; color:var(--text-muted); margin-bottom:14px; letter-spacing:2px;">EVALUATION NODE 0${qIdx+1} / 0${QUESTIONS.length}</div>
-        <div class="aptitude-question">${q.q}</div>
-    `;
+
+    const meta = document.createElement('div');
+    meta.style.cssText = 'font-family:var(--font-mono); font-size:10px; color:var(--text-muted); margin-bottom:14px; letter-spacing:2px;';
+    meta.textContent = `EVALUATION NODE ${pad(qIdx + 1)} / ${pad(QUESTIONS.length)}`;
+
+    const qt = document.createElement('div');
+    qt.className = 'aptitude-question';
+    qt.textContent = q.q;
+
+    card.append(meta, qt);
+
     q.options.forEach(opt => {
         const btn = document.createElement('button');
         btn.className = 'aptitude-option';
+        btn.type = 'button';
         btn.textContent = opt.t;
-        btn.onclick = () => { aptScores[opt.target] += 3; qIdx++; renderQuestion(); };
+        btn.onclick = () => {
+            if (aptScores[opt.target] === undefined) aptScores[opt.target] = 0;
+            aptScores[opt.target] += 3;
+            qIdx++;
+            renderQuestion();
+        };
         card.appendChild(btn);
     });
     area.appendChild(card);
 }
 
 function showResult() {
-    document.getElementById('test-qa-area').innerHTML = '';
-    let best = "OFFICE", max = -1;
-    for (let k in aptScores) { if (aptScores[k] > max) { max = aptScores[k]; best = k; } }
+    $('test-qa-area').innerHTML = '';
+    let best = 'OFFICE', max = -1;
+    for (const k in aptScores) {
+        if (aptScores[k] > max) { max = aptScores[k]; best = k; }
+    }
 
     const RESULTS = {
         CENTER: {
@@ -2124,29 +2552,33 @@ function showResult() {
         }
     };
 
-    const r = RESULTS[best];
-    const dossier = document.getElementById('test-result-dossier');
-    document.getElementById('dossier-org-title').textContent  = best;
-    document.getElementById('dossier-org-title').style.color  = r.color;
-    document.getElementById('dossier-rank-title').textContent = `배정 직책 : ${r.rank}`;
-    document.getElementById('dossier-body-text').textContent  = r.desc;
-    const stamp = document.getElementById('dossier-stamp-color');
-    stamp.textContent  = best + " 승인";
+    const r = RESULTS[best] || RESULTS.OFFICE;
+    const dossier = $('test-result-dossier');
+    const title = $('dossier-org-title');
+    title.textContent = best;
+    title.style.color = r.color;
+    $('dossier-rank-title').textContent = `배정 직책 : ${r.rank}`;
+    $('dossier-body-text').textContent  = r.desc;
+
+    const stamp = $('dossier-stamp-color');
+    stamp.textContent   = best + ' 승인';
     stamp.style.borderColor = r.color;
-    stamp.style.color        = r.color;
-    dossier.style.display    = 'block';
+    stamp.style.color       = r.color;
+
+    dossier.style.display     = 'block';
     dossier.style.borderColor = r.color;
     dossier.style.boxShadow   = `0 0 40px ${r.color}22`;
 }
 
 function resetAptitudeTest() {
-    document.getElementById('test-result-dossier').style.display = 'none';
-    document.getElementById('test-intro-box').style.display = 'block';
+    $('test-result-dossier').style.display = 'none';
+    $('test-qa-area').innerHTML = '';
+    $('test-intro-box').style.display = 'block';
 }
 
-// ============================================================
-// MODULE 4: GARDEN RITE — EXPANDED
-// ============================================================
+/* ============================================================
+   MODULE 4: GARDEN RITE
+   ============================================================ */
 const DECEASED_DB = [
     {
         name: "HAN YIGYEOL — 20세, 하이브 구역",
@@ -2342,18 +2774,37 @@ const DECEASED_DB = [
     }
 ];
 
-let selectedDeceased = null, selectedFlower = '', selectedFlowerTier = '', selectedRitualModifier = '';
+
+let selectedDeceased = null;
+let selectedFlower = '';
+let selectedFlowerTier = '';
+let selectedRitualModifier = '';
+let burning = false;
 
 function initGarden() {
-    const list = document.getElementById('garden-profile-list');
-    const countEl = document.getElementById('garden-profile-count');
+    const list = $('garden-profile-list');
+    const countEl = $('garden-profile-count');
     list.innerHTML = '';
     if (countEl) countEl.textContent = DECEASED_DB.length;
-    DECEASED_DB.forEach((d) => {
+
+    DECEASED_DB.forEach(d => {
         const div = document.createElement('div');
         div.className = 'deceased-row';
-        div.innerHTML = `<div class="deceased-name">${d.name}</div><div class="deceased-meta">${d.meta.replace(/\n/g,'<br>')}</div>`;
+
+        const nm = document.createElement('div');
+        nm.className = 'deceased-name';
+        nm.textContent = d.name;
+
+        const mt = document.createElement('div');
+        mt.className = 'deceased-meta';
+        d.meta.split('\n').forEach((line, i) => {
+            if (i) mt.appendChild(document.createElement('br'));
+            mt.appendChild(document.createTextNode(line));
+        });
+
+        div.append(nm, mt);
         div.onclick = () => {
+            if (burning) return;
             document.querySelectorAll('.deceased-row').forEach(r => r.classList.remove('selected'));
             div.classList.add('selected');
             selectedDeceased = d;
@@ -2364,89 +2815,126 @@ function initGarden() {
         list.appendChild(div);
     });
 }
-initGarden();
 
 function updateRitualQuestion() {
-    const panel = document.getElementById('ritual-question-panel');
-    const qtxt = document.getElementById('ritual-q-text');
-    const optsContainer = document.getElementById('ritual-options-container');
-    if (!selectedDeceased || !selectedFlower) { panel.classList.remove('visible'); return; }
+    const panel = $('ritual-question-panel');
+    const qtxt  = $('ritual-q-text');
+    const opts  = $('ritual-options-container');
+
+    if (!selectedDeceased || !selectedFlower) {
+        panel.classList.remove('visible');
+        return;
+    }
     panel.classList.add('visible');
     qtxt.textContent = selectedDeceased.ritual_q;
-    optsContainer.innerHTML = '';
+    opts.innerHTML = '';
+
     selectedDeceased.ritual_opts.forEach(opt => {
         const btn = document.createElement('button');
         btn.className = 'ritual-opt-btn';
+        btn.type = 'button';
         btn.textContent = opt.label;
         btn.onclick = () => {
-            document.querySelectorAll('.ritual-opt-btn').forEach(b => b.classList.remove('selected-ritual'));
+            opts.querySelectorAll('.ritual-opt-btn').forEach(b => b.classList.remove('selected-ritual'));
             btn.classList.add('selected-ritual');
             selectedRitualModifier = opt.modifier;
             checkBurnReady();
         };
-        optsContainer.appendChild(btn);
+        opts.appendChild(btn);
     });
 }
 
-function selectFlowerType(name, tier) {
-    selectedFlower = name; selectedFlowerTier = tier;
-    document.querySelectorAll('.flower-btn').forEach(b => b.classList.remove('selected-flower'));
-    event.currentTarget.classList.add('selected-flower');
+/* 전역 event 객체에 의존하던 부분을 명시적 인자로 변경 */
+function selectFlowerType(evt, name, tier) {
+    if (burning) return;
+    selectedFlower = name;
+    selectedFlowerTier = tier;
 
-    const node = document.getElementById('altar-flower-node');
-    const badge = document.getElementById('garden-tier-badge');
-    const TIER_COLORS = { surface:'var(--color-garden)', hidden:'var(--color-office)', deep:'var(--color-center)' };
-    const TIER_LABELS = { surface:'표면 기밀 — TIER I', hidden:'심층 기밀 — TIER II', deep:'봉인 기밀 — TIER III' };
-    const TIER_CSS    = { surface:'tier-surface', hidden:'tier-hidden', deep:'tier-deep' };
+    document.querySelectorAll('.flower-btn').forEach(b => b.classList.remove('selected-flower'));
+    if (evt && evt.currentTarget) evt.currentTarget.classList.add('selected-flower');
+
+    const TIER_COLORS = { surface: 'var(--color-garden)', hidden: 'var(--color-office)', deep: 'var(--color-center)' };
+    const TIER_RGB    = { surface: '0,230,118',           hidden: '240,180,41',          deep: '255,82,82' };
+    const TIER_LABELS = { surface: '표면 기밀 — TIER I',  hidden: '심층 기밀 — TIER II', deep: '봉인 기밀 — TIER III' };
+    const TIER_CSS    = { surface: 'tier-surface',        hidden: 'tier-hidden',         deep: 'tier-deep' };
+
+    const node = $('altar-flower-node');
     node.style.borderColor = TIER_COLORS[tier];
-    node.style.boxShadow = `0 0 20px ${TIER_COLORS[tier]}66, inset 0 0 20px ${TIER_COLORS[tier]}22`;
+    node.style.boxShadow = `0 0 20px rgba(${TIER_RGB[tier]},0.45), inset 0 0 20px rgba(${TIER_RGB[tier]},0.15)`;
+
+    const badge = $('garden-tier-badge');
     if (badge) {
         badge.style.display = 'block';
         badge.className = 'garden-tier-indicator ' + TIER_CSS[tier];
         badge.textContent = TIER_LABELS[tier];
     }
+
     updateRitualQuestion();
     checkBurnReady();
 }
 
 function checkBurnReady() {
-    document.getElementById('burn-ritual-btn').disabled = !(selectedDeceased && selectedFlower && selectedRitualModifier);
+    $('burn-ritual-btn').disabled =
+        burning || !(selectedDeceased && selectedFlower && selectedRitualModifier);
 }
 
 async function executeFlowerBurning() {
-    const btn  = document.getElementById('burn-ritual-btn');
-    const node = document.getElementById('altar-flower-node');
-    const lore = document.getElementById('garden-lore-box');
+    if (burning || !selectedDeceased || !selectedFlower || !selectedRitualModifier) return;
+    burning = true;
+
+    const btn  = $('burn-ritual-btn');
+    const node = $('altar-flower-node');
+    const lore = $('garden-lore-box');
+
+    // 정리 전에 필요한 값을 미리 확보 (비동기 도중 초기화되어 생기던 오류 방지)
+    const dec  = selectedDeceased;
+    const tier = selectedFlowerTier;
+    const flw  = selectedFlower;
+    const mod  = selectedRitualModifier;
+
     btn.disabled = true;
     node.classList.add('burning');
 
-    const tierLabel = { surface:'표면 기밀 해제', hidden:'심층 기밀 해제', deep:'봉인 기밀 해제 ⚠' };
-    const tierColor = { surface:'var(--color-garden)', hidden:'var(--color-office)', deep:'var(--color-center)' };
-    lore.textContent = `>> 화염 채널 점화 중 [${tierLabel[selectedFlowerTier]}] ...\n잔존 흔적을 GARDEN 데이터베이스로 변환 중...`;
-    await wait(2600);
+    const tierLabel = { surface: '표면 기밀 해제', hidden: '심층 기밀 해제', deep: '봉인 기밀 해제 ⚠' };
+    const tierColor = { surface: 'var(--color-garden)', hidden: 'var(--color-office)', deep: 'var(--color-center)' };
+
+    lore.textContent = `>> 화염 채널 점화 중 [${tierLabel[tier]}] ...\n잔존 흔적을 GARDEN 데이터베이스로 변환 중...`;
+    await wait(2400);
     node.classList.remove('burning');
 
-    const loreTier = selectedDeceased.lore[selectedFlowerTier] || selectedDeceased.lore.surface;
-    const suffix = selectedDeceased.lore.suffix ? (selectedDeceased.lore.suffix[selectedRitualModifier] || '') : '';
-    const col = tierColor[selectedFlowerTier];
-    lore.innerHTML = `<strong style="color:${col};">[${tierLabel[selectedFlowerTier]} — ${selectedFlower.toUpperCase()} // ${selectedDeceased.name.split(' — ')[0]}]</strong>${loreTier}<em style="color:${col}; opacity:0.75;">${suffix}</em>`;
+    const body   = dec.lore[tier] || dec.lore.surface;
+    const suffix = dec.lore.suffix ? (dec.lore.suffix[mod] || '') : '';
+    const col    = tierColor[tier];
 
+    lore.innerHTML = '';
+    const head = document.createElement('strong');
+    head.style.color = col;
+    head.textContent = `[${tierLabel[tier]} — ${flw.toUpperCase()} // ${dec.name.split(' — ')[0]}]`;
+    const bodyNode = document.createTextNode(body);
+    const em = document.createElement('em');
+    em.style.color = col;
+    em.style.opacity = '0.75';
+    em.textContent = suffix;
+    lore.append(head, bodyNode, em);
+
+    // 상태 초기화
     selectedDeceased = null; selectedFlower = ''; selectedFlowerTier = ''; selectedRitualModifier = '';
     document.querySelectorAll('.deceased-row').forEach(r => r.classList.remove('selected'));
     document.querySelectorAll('.flower-btn').forEach(b => b.classList.remove('selected-flower'));
     document.querySelectorAll('.ritual-opt-btn').forEach(b => b.classList.remove('selected-ritual'));
-    document.getElementById('ritual-question-panel').classList.remove('visible');
+    $('ritual-question-panel').classList.remove('visible');
     node.style.borderColor = 'var(--color-garden)';
-    node.style.boxShadow = '';
-    const badge = document.getElementById('garden-tier-badge');
+    node.style.boxShadow = '0 0 20px rgba(0,230,118,0.4), inset 0 0 20px rgba(0,230,118,0.1)';
+    const badge = $('garden-tier-badge');
     if (badge) badge.style.display = 'none';
+
+    burning = false;
+    checkBurnReady();
 }
 
-// ============================================================
-// MODULE 5: CLINIC — COST RELIEF SYNC (EXPANDED)
-// ============================================================
-
-// Difficulty config
+/* ============================================================
+   MODULE 5: CLINIC — COST RELIEF SYNC
+   ============================================================ */
 const SYNC_DIFFICULTIES = {
     DORMANT:  { labelKo:'휴면', speed:0.008, zoneMin:0.72, zoneMax:1.28, gaugeMax:15, costHeal:15, costPenalty:6,  tier:1 },
     STABLE:   { labelKo:'안정', speed:0.013, zoneMin:0.84, zoneMax:1.16, gaugeMax:10, costHeal:12, costPenalty:8,  tier:2 },
@@ -2455,7 +2943,6 @@ const SYNC_DIFFICULTIES = {
     RUNAWAY:  { labelKo:'폭주', speed:0.038, zoneMin:0.965,zoneMax:1.035,gaugeMax:3,  costHeal:6,  costPenalty:18, tier:5 }
 };
 
-// Tiered secrets for sync events
 const SYNC_SECRETS = [
     // Tier 1 — DORMANT
     {
@@ -2519,181 +3006,173 @@ COVE는 수확지다 — 능력 데이터, 생체 기질, 2세대 유전 계보.
     }
 ];
 
+
+const RING_BASE = 150;       // .pulse-expanding-ring 기본 크기(px)
+const PULSE_MAX = 2.2;
+
 let pulseScale = 0.1;
-let clinicPulseEl = document.getElementById('clinic-pulse-ring');
-let hitFlash = document.getElementById('pulse-hit-flash');
 let syncOk = 0, syncTotal = 0;
-let syncLoopActive = true;
 let syncGaugeCount = 0;
 let syncWave = 1;
 let syncSpeedMult = 1.0;
-let syncConsecutive = 0; // combo counter
+let syncConsecutive = 0;
 let currentDiff = 'DORMANT';
+let clinicModalOpen = false;
 let unlockedSecretTiers = new Set();
 
+const clinicPulseEl = $('clinic-pulse-ring');
+const hitFlash      = $('pulse-hit-flash');
+
 function setDifficulty(diff) {
+    if (!SYNC_DIFFICULTIES[diff]) return;
     currentDiff = diff;
-    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('diff-active'));
-    const btn = document.getElementById('diff-' + diff);
-    if (btn) btn.classList.add('diff-active');
     const cfg = SYNC_DIFFICULTIES[diff];
-    // Update gauge max display and reset gauge
+
+    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('diff-active'));
+    const btn = $('diff-' + diff);
+    if (btn) btn.classList.add('diff-active');
+
     syncGaugeCount = 0;
+    syncConsecutive = 0;
     updateSyncGauge();
-    // Update arena label
-    const label = document.getElementById('clinic-arena-label');
+
+    const label = $('clinic-arena-label');
     if (label) label.textContent = `ANCHOR 동기화 // ${cfg.labelKo.toUpperCase()} MODE — TIER ${cfg.tier}`;
-    // Update tier label in header
-    const tierLabel = document.getElementById('diff-tier-label');
+
+    const tierLabel = $('diff-tier-label');
     if (tierLabel) tierLabel.textContent = `Tier ${cfg.tier}`;
-    // Update target zone visual size based on difficulty
-    const targetZone = document.getElementById('pulse-target-zone-el');
-    if (targetZone) {
-        const zoneSize = 150 * (cfg.zoneMax - cfg.zoneMin) / 0.56 * 0.62 + 80;
-        // Visually adjust target zone width/height
-        const baseSize = 150;
-        const innerRatio = (cfg.zoneMax - cfg.zoneMin) / 0.56; // normalize to default range
-        const visualSize = Math.max(60, Math.min(150, baseSize * innerRatio));
-        targetZone.style.width  = visualSize + 'px';
-        targetZone.style.height = visualSize + 'px';
+
+    /* 타겟 존을 "실제 판정 구간"과 일치시킨다.
+       기존에는 존 크기가 판정 범위와 무관해 눈으로 맞춰도 실패했다. */
+    const outer = $('pulse-zone-outer');
+    const inner = $('pulse-zone-inner');
+    if (outer) {
+        const s = RING_BASE * cfg.zoneMax;
+        outer.style.width = outer.style.height = s + 'px';
     }
+    if (inner) {
+        const s = RING_BASE * cfg.zoneMin;
+        inner.style.width = inner.style.height = s + 'px';
+    }
+
     updateSpeedUI();
 }
 
 function updateSpeedUI() {
-    const mult = syncSpeedMult;
-    const bar = document.getElementById('sync-speed-bar');
-    const multEl = document.getElementById('sync-speed-mult');
-    const waveEl = document.getElementById('sync-wave-num');
-    const pct = Math.min(100, ((mult - 1.0) / 1.5) * 100 + 5);
+    const bar    = $('sync-speed-bar');
+    const multEl = $('sync-speed-mult');
+    const waveEl = $('sync-wave-num');
+    const pct = clamp(((syncSpeedMult - 1.0) / 1.5) * 100 + 5, 0, 100);
     if (bar) {
         bar.style.width = pct + '%';
-        bar.style.background = mult >= 2.0 ? 'var(--color-center)' : mult >= 1.5 ? 'var(--color-office)' : 'var(--color-clinic)';
+        bar.style.background = syncSpeedMult >= 2.0 ? 'var(--color-center)'
+                             : syncSpeedMult >= 1.5 ? 'var(--color-office)'
+                             : 'var(--color-clinic)';
     }
-    if (multEl) multEl.textContent = '×' + mult.toFixed(1);
+    if (multEl) multEl.textContent = '×' + syncSpeedMult.toFixed(1);
     if (waveEl) waveEl.textContent = syncWave;
 }
 
-// 클리닉 이벤트 모달 HTML 삽입
+function updateSyncGauge() {
+    const cfg = SYNC_DIFFICULTIES[currentDiff];
+    const bar   = $('sync-progress-bar');
+    const count = $('sync-gauge-count');
+    if (bar)   bar.style.width = clamp(syncGaugeCount / cfg.gaugeMax * 100, 0, 100) + '%';
+    if (count) count.textContent = syncGaugeCount + ' / ' + cfg.gaugeMax;
+}
+
+/* ── 펄스 루프 ────────────────────────────────────────────────
+   width/height를 매 프레임 바꾸면 레이아웃이 계속 재계산된다.
+   transform: scale() 은 합성 단계에서만 처리 → 부하가 거의 없다. */
+Loops.define('clinic', dt => {
+    const cfg = SYNC_DIFFICULTIES[currentDiff];
+    pulseScale += cfg.speed * syncSpeedMult * (dt / 16.667);
+    if (pulseScale >= PULSE_MAX) pulseScale = 0.1;
+
+    clinicPulseEl.style.transform = `scale(${pulseScale.toFixed(4)})`;
+    clinicPulseEl.style.opacity = Math.max(0, 1 - pulseScale / (PULSE_MAX + 0.2)).toFixed(3);
+});
+
+/* ── 이벤트 모달 ─────────────────────────────────────────── */
 (function injectClinicEventModal() {
     const modal = document.createElement('div');
     modal.id = 'clinic-event-modal';
-    modal.style.cssText = `
-        position:fixed; inset:0; z-index:9999;
-        background:rgba(0,5,18,0.95);
-        display:none; flex-direction:column;
-        justify-content:center; align-items:center; gap:24px;
-        backdrop-filter:blur(14px);
-    `;
+    modal.className = 'clinic-modal';
     modal.innerHTML = `
-        <div id="clinic-event-tier-tag" style="font-family:var(--font-display); font-size:9px; letter-spacing:6px; color:var(--color-clinic); margin-bottom:-6px;">CLINIC UNDER // 기밀 해제</div>
-        <div id="clinic-event-title" style="font-family:var(--font-display); font-size:26px; font-weight:900; letter-spacing:4px; color:#fff; text-shadow:0 0 30px rgba(0,229,255,0.8); text-align:center; line-height:1.3;">
+        <div id="clinic-event-tier-tag" class="clinic-modal-tag">CLINIC UNDER // 기밀 해제</div>
+        <div id="clinic-event-title" class="clinic-modal-title">
             동기화 임계치 달성<br>
-            <span id="clinic-event-subtitle" style="font-size:12px; letter-spacing:6px; color:var(--color-clinic);">SYNC THRESHOLD REACHED</span>
+            <span id="clinic-event-subtitle" class="clinic-modal-sub">SYNC THRESHOLD REACHED</span>
         </div>
-        <div id="clinic-event-body" style="
-            max-width:90%; width: 580px; padding:28px 36px;
-            border:1px solid rgba(0,229,255,0.3);
-            background:rgba(0,15,30,0.85);
-            font-family:var(--font-mono); font-size:12px;
-            line-height:2.1; color:#9ab4d4; text-align:center;
-            box-shadow:0 0 60px rgba(0,229,255,0.08);
-            position:relative;
-        ">
-            <div style="position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--color-clinic),transparent);"></div>
+        <div id="clinic-event-body" class="clinic-modal-body"></div>
+        <div class="clinic-modal-actions">
+            <button type="button" class="clinic-modal-btn" onclick="closeClinicEvent(false)">기록 확인 완료</button>
+            <button type="button" class="clinic-modal-btn danger" onclick="closeClinicEvent(true)">난이도 상승 후 계속</button>
         </div>
-        <div style="display:flex; gap:14px; flex-wrap:wrap; justify-content:center;">
-            <button onclick="closeClinicEvent(false)" style="
-                background:transparent; border:1px solid var(--color-clinic);
-                color:var(--color-clinic); font-family:var(--font-display);
-                font-size:10px; font-weight:700; padding:13px 36px;
-                letter-spacing:3px; cursor:pointer; transition:all 0.2s;
-                box-shadow:0 0 15px rgba(0,229,255,0.12);
-            ">기록 확인 완료</button>
-            <button onclick="closeClinicEvent(true)" style="
-                background:transparent; border:1px solid rgba(255,82,82,0.4);
-                color:rgba(255,82,82,0.7); font-family:var(--font-display);
-                font-size:10px; font-weight:700; padding:13px 36px;
-                letter-spacing:3px; cursor:pointer; transition:all 0.2s;
-            ">난이도 상승 후 계속</button>
-        </div>
-        <div id="clinic-secret-archive" style="font-family:var(--font-mono); font-size:10px; color:var(--text-muted); letter-spacing:1px; margin-top:-8px;"></div>
+        <div id="clinic-secret-archive" class="clinic-modal-archive"></div>
     `;
     document.body.appendChild(modal);
 })();
-
-function closeClinicEvent(escalate) {
-    document.getElementById('clinic-event-modal').style.display = 'none';
-    if (escalate) {
-        // escalate difficulty
-        const order = ['DORMANT','STABLE','ACTIVE','CRITICAL','RUNAWAY'];
-        const idx = order.indexOf(currentDiff);
-        if (idx < order.length - 1) setDifficulty(order[idx + 1]);
-        // increase wave and speed
-        syncWave++;
-        syncSpeedMult = Math.min(2.5, syncSpeedMult * 1.18);
-        updateSpeedUI();
-    }
-    syncGaugeCount = 0;
-    updateSyncGauge();
-}
 
 function triggerClinicEvent() {
     const cfg = SYNC_DIFFICULTIES[currentDiff];
     const secret = SYNC_SECRETS.find(s => s.tier === cfg.tier) || SYNC_SECRETS[0];
     unlockedSecretTiers.add(cfg.tier);
 
-    const modal  = document.getElementById('clinic-event-modal');
-    const tag    = document.getElementById('clinic-event-tier-tag');
-    const title  = document.getElementById('clinic-event-title');
-    const sub    = document.getElementById('clinic-event-subtitle');
-    const body   = document.getElementById('clinic-event-body');
-    const arch   = document.getElementById('clinic-secret-archive');
+    const modal = $('clinic-event-modal');
+    const tag   = $('clinic-event-tier-tag');
+    const title = $('clinic-event-title');
+    const sub   = $('clinic-event-subtitle');
+    const body  = $('clinic-event-body');
+    const arch  = $('clinic-secret-archive');
 
-    tag.style.color    = secret.color;
-    tag.textContent    = secret.subtitle;
-    sub.style.color    = secret.color;
-    sub.textContent    = `WAVE ${syncWave} // TIER ${cfg.tier} 기밀 해제`;
+    tag.style.color = secret.color;
+    tag.textContent = secret.subtitle;
+    sub.style.color = secret.color;
+    sub.textContent = `WAVE ${syncWave} // TIER ${cfg.tier} 기밀 해제`;
     title.style.textShadow = `0 0 30px ${secret.color}99`;
     body.style.borderColor = secret.color + '55';
     body.style.boxShadow   = `0 0 60px ${secret.color}15`;
-    body.querySelector('div').style.background = `linear-gradient(90deg, transparent, ${secret.color}, transparent)`;
-    body.innerHTML = `<div style="position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,${secret.color},transparent);"></div>
-        <span style="color:${secret.color}; display:block; margin-bottom:14px; letter-spacing:3px; font-size:11px;">[봉인 해제 — ${secret.subtitle}]</span>
-        ${secret.body}`;
-    arch.textContent = `해제된 기밀: Tier ${[...unlockedSecretTiers].sort().join(', ')} / 5`;
+    body.innerHTML =
+        `<div class="clinic-modal-body-line" style="background:linear-gradient(90deg,transparent,${secret.color},transparent);"></div>
+         <span style="color:${secret.color}; display:block; margin-bottom:14px; letter-spacing:3px; font-size:11px;">[봉인 해제 — ${secret.subtitle}]</span>
+         ${secret.body}`;
+
+    arch.textContent = `해제된 기밀: Tier ${[...unlockedSecretTiers].sort((a, b) => a - b).join(', ')} / 5`;
 
     modal.style.display = 'flex';
+    clinicModalOpen = true;
+    syncLoops();                       // 모달이 열려 있는 동안 펄스 루프 정지
 }
 
-function updateSyncGauge() {
-    const cfg = SYNC_DIFFICULTIES[currentDiff];
-    const bar   = document.getElementById('sync-progress-bar');
-    const count = document.getElementById('sync-gauge-count');
-    if (bar)   bar.style.width = (syncGaugeCount / cfg.gaugeMax * 100) + '%';
-    if (count) count.textContent = syncGaugeCount + ' / ' + cfg.gaugeMax;
-}
+function closeClinicEvent(escalate) {
+    $('clinic-event-modal').style.display = 'none';
+    clinicModalOpen = false;
 
-function runClinicLoop() {
-    if (!syncLoopActive) return;
-    const cfg = SYNC_DIFFICULTIES[currentDiff];
-    const speed = cfg.speed * syncSpeedMult;
-    pulseScale += speed;
-    if (pulseScale >= 2.2) {
-        pulseScale = 0.1;
+    if (escalate) {
+        const order = ['DORMANT', 'STABLE', 'ACTIVE', 'CRITICAL', 'RUNAWAY'];
+        const idx = order.indexOf(currentDiff);
+        syncWave++;
+        syncSpeedMult = Math.min(2.5, syncSpeedMult * 1.18);
+        if (idx < order.length - 1) setDifficulty(order[idx + 1]);
+        else { updateSyncGauge(); updateSpeedUI(); }
+    } else {
+        syncGaugeCount = 0;
+        updateSyncGauge();
     }
-    const size = 150 * pulseScale;
-    clinicPulseEl.style.width  = size + 'px';
-    clinicPulseEl.style.height = size + 'px';
-    clinicPulseEl.style.opacity = Math.max(0, 1 - pulseScale / 2.2);
-    requestAnimationFrame(runClinicLoop);
+    pulseScale = 0.1;
+    syncLoops();
 }
-runClinicLoop();
+
+/* ── 판정 ───────────────────────────────────────────────── */
+let resultTimer = null, flashTimer = null, comboTimer = null;
 
 function checkClinicSyncTiming() {
+    if (clinicModalOpen) return;
     syncTotal++;
+
     const cfg = SYNC_DIFFICULTIES[currentDiff];
-    const resultEl = document.getElementById('sync-result-display');
+    const resultEl = $('sync-result-display');
     const inZone = pulseScale >= cfg.zoneMin && pulseScale <= cfg.zoneMax;
 
     if (inZone) {
@@ -2701,70 +3180,90 @@ function checkClinicSyncTiming() {
         syncConsecutive++;
         const isCombo = syncConsecutive >= 3;
         const gaugeGain = isCombo ? 2 : 1;
+
         globalCost = Math.max(0, globalCost - cfg.costHeal);
         updateCostBar();
+
         syncGaugeCount = Math.min(cfg.gaugeMax, syncGaugeCount + gaugeGain);
         updateSyncGauge();
 
-        if (syncGaugeCount >= cfg.gaugeMax) {
-            setTimeout(triggerClinicEvent, 400);
-        }
-
-        // combo flash
         if (isCombo) {
-            const comboEl = document.getElementById('combo-flash-text');
+            const comboEl = $('combo-flash-text');
             if (comboEl) {
                 comboEl.textContent = `COMBO ×${syncConsecutive}`;
-                comboEl.style.opacity = '1';
                 comboEl.style.transition = 'opacity 0.05s';
-                setTimeout(() => { comboEl.style.transition = 'opacity 0.8s'; comboEl.style.opacity = '0'; }, 600);
+                comboEl.style.opacity = '1';
+                clearTimeout(comboTimer);
+                comboTimer = setTimeout(() => {
+                    comboEl.style.transition = 'opacity 0.8s';
+                    comboEl.style.opacity = '0';
+                }, 600);
             }
-            customCursor.style.boxShadow = '0 0 25px var(--color-office)';
-            setTimeout(() => customCursor.style.boxShadow = '', 400);
         }
+        flashCursor(isCombo ? 'var(--color-office)' : 'var(--color-clinic)', isCombo ? 400 : 300);
 
-        // hit flash
-        hitFlash.style.opacity = '1';
+        hitFlash.style.transition  = 'opacity 0.05s';
+        hitFlash.style.opacity     = '1';
         hitFlash.style.borderColor = isCombo ? 'var(--color-office)' : 'var(--color-clinic)';
-        hitFlash.style.boxShadow = isCombo
+        hitFlash.style.boxShadow   = isCombo
             ? '0 0 30px var(--color-office), 0 0 60px rgba(240,180,41,0.3)'
             : '0 0 30px var(--color-clinic), 0 0 60px rgba(0,229,255,0.3)';
-        hitFlash.style.transition = 'opacity 0.05s';
-        setTimeout(() => { hitFlash.style.transition = 'opacity 0.5s'; hitFlash.style.opacity = '0'; }, 80);
+        clearTimeout(flashTimer);
+        flashTimer = setTimeout(() => {
+            hitFlash.style.transition = 'opacity 0.5s';
+            hitFlash.style.opacity = '0';
+        }, 80);
 
-        if (!isCombo) customCursor.style.boxShadow = '0 0 25px var(--color-clinic)';
-        setTimeout(() => customCursor.style.boxShadow = '', 300);
         resultEl.style.color = isCombo ? 'var(--color-office)' : 'var(--color-clinic)';
         resultEl.style.textShadow = isCombo ? '0 0 10px var(--color-office)' : '0 0 10px var(--color-clinic)';
-        resultEl.textContent = isCombo ? `COMBO! +${gaugeGain}게이지` : 'SYNC 성공';
+        resultEl.textContent = isCombo ? `COMBO! +${gaugeGain} 게이지` : 'SYNC 성공';
         resultEl.style.opacity = '1';
+
+        if (syncGaugeCount >= cfg.gaugeMax) setTimeout(triggerClinicEvent, 400);
+
     } else {
         syncConsecutive = 0;
         globalCost = Math.min(100, globalCost + cfg.costPenalty);
         updateCostBar();
-        customCursor.style.boxShadow = '0 0 20px var(--color-center)';
-        setTimeout(() => customCursor.style.boxShadow = '', 300);
+        flashCursor('var(--color-center)', 300);
         resultEl.style.color = 'var(--color-center)';
         resultEl.style.textShadow = '0 0 10px var(--color-center)';
-        resultEl.textContent = '타이밍 미스';
+        resultEl.textContent = pulseScale < cfg.zoneMin ? '타이밍 미스 — 너무 빠름' : '타이밍 미스 — 너무 느림';
         resultEl.style.opacity = '1';
     }
 
-    setTimeout(() => { resultEl.style.opacity = '0'; }, 700);
+    clearTimeout(resultTimer);
+    resultTimer = setTimeout(() => { resultEl.style.opacity = '0'; }, 700);
     updateClinicStats();
 }
 
 function updateClinicStats() {
     const rate = syncTotal === 0 ? 100 : Math.round(syncOk / syncTotal * 100);
     const txt = `안정화율: ${rate}% // SYNC 성공: ${syncOk}회 // 콤보: ${syncConsecutive}`;
-    document.getElementById('clinic-sync-stats').textContent = txt;
-    document.getElementById('clinic-sync-stats-bottom').textContent = txt;
+    $('clinic-sync-stats').textContent = txt;
+    $('clinic-sync-stats-bottom').textContent = txt;
 }
 
-// init
+/* 스페이스바 / 엔터로도 SYNC */
+document.addEventListener('keydown', e => {
+    if (e.code !== 'Space' && e.code !== 'Enter') return;
+    if (currentTab !== 'mod-clinic') return;
+    const t = e.target;
+    if (t && (t.tagName === 'BUTTON' || t.tagName === 'SELECT' || t.tagName === 'INPUT')) return;
+    e.preventDefault();
+    checkClinicSyncTiming();
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+initGarden();
 updateCostBar();
-updateSyncGauge();
 setDifficulty('DORMANT');
+updateSyncGauge();
+updateClinicStats();
+bootSuikaGame();
+syncLoops();
 
 </script>
 </body>
